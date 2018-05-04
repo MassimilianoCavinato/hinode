@@ -6,3 +6,5 @@
 /server/package-lock.json
 /server/npm-debug.log
 /server/db/atlas.js
+/server/img/*
+!/server/img/.gitkeep
