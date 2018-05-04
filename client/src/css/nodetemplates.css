@@ -1,0 +1,52 @@
+.header-fixed thead {
+	width: 100%;
+}
+
+.header-fixed tbody {
+	height: 90vh;
+	overflow-y: auto;
+	width: 100%;
+}
+
+.header-fixed thead tr{
+	width: 99%;
+}
+
+ .header-fixed tr{
+ 	width: 100%;
+ }
+
+.header-fixed thead, .header-fixed tbody, .header-fixed tr, .header-fixed td, .header-fixed th{
+	display: inline-block;
+}
+
+.header-fixed thead{
+	background-color:  #2e86c1;
+    color: #ffffff;
+
+}
+
+.header-fixed tbody td, .header-fixed thead > tr> th{
+	float: left;
+	border-bottom-width: 0;
+}
+
+.header-fixed>tbody>tr>td, .header-fixed>tbody>tr>th, .header-fixed>tfoot>tr>td, .header-fixed>tfoot>tr>th, .header-fixed>thead>tr>td, .header-fixed>thead>tr>th{
+	padding: 8px;
+	height: 50px;
+	text-align: center;
+	line-height: 32px;
+}
+
+.header-fixed-scrollbar{
+	overflow-y: scroll;
+}
+
+.node-template-row{
+    font-size: 12px;
+}
+
+.node-template-row:hover{
+    cursor: pointer;
+    background-color: rgba(0,255,0,.1);
+}

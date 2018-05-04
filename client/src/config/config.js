@@ -1,0 +1,6 @@
+const SERVER_PROTOCOL = "http"
+const SERVER_IP = "127.0.0.1"
+const SERVER_PORT = "3001"
+const SERVER_URL = SERVER_PROTOCOL+"://"+SERVER_IP+":"+SERVER_PORT
+
+export { SERVER_URL }
