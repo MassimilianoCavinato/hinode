@@ -68,8 +68,8 @@
     cursor: pointer;
     font-size: 12px;
     position: relative;
-    padding: 8px;
-    height: 50px;
+    padding: 4px;
+    height: 64px;
     font-weight: bold;
 }
 
@@ -80,5 +80,5 @@
     position: absolute;
     right: 2px;
     top: 2px;
-    height: 40px;
+    height: 52px;
 }

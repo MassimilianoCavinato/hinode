@@ -1,6 +1,6 @@
 module.exports =  function (req, res){
 
-    let atlas = require('../../db/atlas')
+    let atlas = require('../../db/atlas').atlas
     let bcrypt = require('bcryptjs')
     let username = req.body.username
     let email = req.body.email

@@ -340,6 +340,8 @@ class NetworkGraph extends React.Component{
                     {node.vendor} {node.type}
                     <br />
                     {node.name}
+                    <br />
+                    {node.ip}
                     <img src={node.image} alt=''/>
                 </div>
             )
