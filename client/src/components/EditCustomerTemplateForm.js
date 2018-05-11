@@ -3,16 +3,17 @@ import { SERVER_URL } from '../config/config'
 import axios from 'axios'
 import { WithContext as ReactTags } from 'react-tag-input'
 
-class EditNodeTemplateForm extends React.Component{
+class EditCustomerTemplateForm extends React.Component{
 
     constructor(props){
         super(props)
         this.state = {
             template: this.props.template,
             _id: this.props.template._id,
-            type:  this.props.template.type,
-            vendor:  this.props.template.vendor,
-            name:  this.props.template.name,
+            template_name: this.props.template.template_name,
+            group: this.props.template.group,
+            provider:  this.props.template.provider,
+            priority:  this.props.template.priority,
             image:  this.props.template.image,
             tags:  this.props.template.tags,
             suggestions: []
@@ -21,7 +22,6 @@ class EditNodeTemplateForm extends React.Component{
 
     componentDidMount(){
         this.getTags()
-
     }
 
     getTags(){
@@ -42,9 +42,10 @@ class EditNodeTemplateForm extends React.Component{
         e.preventDefault()
         let template = {
             _id: this.state._id,
-            type:  this.state.type,
-            vendor:  this.state.vendor,
-            name:  this.state.name,
+            template_name: this.state.template_name,
+            group:  this.state.group,
+            provider:  this.state.provider,
+            priority:  this.state.priority,
             image:  this.state.image,
             tags:  this.state.tags
         }
@@ -84,6 +85,19 @@ class EditNodeTemplateForm extends React.Component{
         }
     }
 
+    showPriorityText(){
+        switch(this.state.priority){
+            case 1:
+                return "Low"
+            case 2:
+                return "Medium"
+            case 3:
+                return "High"
+            default:
+                return "Medium"
+        }
+    }
+
     render(){
         return(
             <div className='row'>
@@ -93,7 +107,7 @@ class EditNodeTemplateForm extends React.Component{
                             <button onClick={() => this.props.switchToReadMode()}className='btn btn-warning' style={{marginTop: 24}}><span className='glyphicon glyphicon-backward' /> Back</button>
                         </div>
                         <div className="col-sm-8">
-                            <h1>Edit Node Template</h1>
+                            <h1>Edit Device Template</h1>
                         </div>
                     </div>
                     <form>
@@ -103,23 +117,28 @@ class EditNodeTemplateForm extends React.Component{
                                 <input type="text"  value={this.props.template._id} className="form-control input-sm" placeholder='Radio, Switch, Sector ...' readOnly/>
                             </div>
                         </div>
+
                         <div className="form-group row">
-                            <label className="col-sm-4 col-form-label">Type</label>
+                            <label className="col-sm-4 col-form-label">Template Name</label>
                             <div className="col-sm-8">
-                                <input type="text"  value={this.state.type} className="form-control input-sm" placeholder='Radio, Switch, Sector ...' onChange={(e)=>{this.setState({type: e.target.value})}}/>
-                            </div>
-                        </div>
-                        <div className="form-group row">
-                            <label className="col-sm-4 col-form-label">Vendor</label>
-                            <div className="col-sm-8">
-                                <input type="text"  value={this.state.vendor} className="form-control input-sm" placeholder='Juniper, Cisco, Ubiquiti ...'  onChange={(e)=>{this.setState({vendor: e.target.value})}}/>
+                                <input type="text"  value={this.state.template_name} className="form-control input-sm" placeholder='Device Model, Name ...'  onChange={(e)=>{this.setState({template_name: e.target.value})}}/>
                             </div>
                         </div>
 
                         <div className="form-group row">
-                            <label className="col-sm-4 col-form-label">Name</label>
+                            <label className="col-sm-4 col-form-label">Provider</label>
                             <div className="col-sm-8">
-                                <input type="text"  value={this.state.name} className="form-control input-sm" placeholder='Device Model, Name ...'  onChange={(e)=>{this.setState({name: e.target.value})}}/>
+                                <input type="text"  value={this.state.provider} className="form-control input-sm" placeholder='Radio, Switch, Sector ...' onChange={(e)=>{this.setState({provider: e.target.value})}}/>
+                            </div>
+                        </div>
+
+                        <div className="form-group row">
+                            <label className="col-sm-4 col-form-label">Priority</label>
+                            <div className="col-sm-6">
+                                <input required type="range"  value={this.state.priority} className="form-control input-sm" min='1' max='3' step='1' onChange={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}} onInput={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}}/>
+                            </div>
+                            <div className="col-sm-2" style={{textAlign: 'center'}}>
+                                <div className='badge badge-pill' style={{padding: '9px', width: '100%'}}>{this.showPriorityText()}</div>
                             </div>
                         </div>
 
@@ -169,4 +188,4 @@ class EditNodeTemplateForm extends React.Component{
     }
 }
 
-export default EditNodeTemplateForm
+export default EditCustomerTemplateForm

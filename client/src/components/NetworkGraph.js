@@ -317,6 +317,7 @@ class NetworkGraph extends React.Component{
                 if(node.type !== undefined){
                     return node.type.toLowerCase().includes(search_text) ||
                         node.vendor.toLowerCase().includes(search_text) ||
+                        node.model.toLowerCase().includes(search_text) ||
                         node.name.toLowerCase().includes(search_text) ||
                         node.ip.toLowerCase().includes(search_text)
                 }
@@ -337,7 +338,7 @@ class NetworkGraph extends React.Component{
         return this.state.search_results.map((node) => {
             return(
                 <div key={node.id} className="nodeSearchResult form-control" onClick={() => {this.focusSearch(node)}}>
-                    {node.vendor} {node.type}
+                    {node.vendor} {node.model}
                     <br />
                     {node.name}
                     <br />

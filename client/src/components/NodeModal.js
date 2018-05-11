@@ -14,12 +14,13 @@ class NodeModal extends React.Component{
            nodeSearch: '',
            saveError: false,
            saving: false,
-           vendor: this.props.node.vendor,
-           type: this.props.node.type,
-           name: this.props.node.name,
-           tags: this.props.node.tags,
-           image: this.props.node.image,
-           ip: this.props.node.ip,
+           vendor: this.props.node.vendor || '',
+           type: this.props.node.type || '',
+           model: this.props.node.model || '',
+           name: this.props.node.name || '',
+           tags: this.props.node.tags || '',
+           image: this.props.node.image || '',
+           ip: this.props.node.ip || '',
            suggetions: []
         }
     }
@@ -51,7 +52,6 @@ class NodeModal extends React.Component{
     getNodeTemplates(){
         axios.get(SERVER_URL+"/api/nodetemplates/getnodetemplates")
         .then((response) => {
-            console.log("TEMPLATES", response.data)
             this.setState({
                 nodeTemplates: response.data,
             })
@@ -70,14 +70,14 @@ class NodeModal extends React.Component{
             filteredNodeTemplates = this.state.nodeTemplates.filter(nodeTemplate => {
                 return nodeTemplate.type.toLowerCase().includes(search_text) ||
                     nodeTemplate.vendor.toLowerCase().includes(search_text) ||
-                    nodeTemplate.name.toLowerCase().includes(search_text)
+                    nodeTemplate.model.toLowerCase().includes(search_text)
             })
         }
 
         this.setState({
             nodeTemplateFilterResults: filteredNodeTemplates,
             nodeSearch: search_text,
-            image: undefined
+
         })
     }
 
@@ -85,11 +85,11 @@ class NodeModal extends React.Component{
 
         let nodeTemplateFilterResults = this.state.nodeTemplateFilterResults.map(nodeTemplate => {
             return(
-                <div key={nodeTemplate._id} style={{padding: "4px", border: '1px solid gray', borderRadius: '2px', marginBottom: '2px', backgroundColor: '#DDD', cursor: 'pointer', height: '50px'}} onClick={(e) => {this.selectNodeTemplate(e, {type: nodeTemplate.type, vendor: nodeTemplate.vendor, name: nodeTemplate.name, tags: nodeTemplate.tags, image: nodeTemplate.image})}}>
+                <div key={nodeTemplate._id} style={{padding: "4px", border: '1px solid gray', borderRadius: '2px', marginBottom: '2px', backgroundColor: '#DDD', cursor: 'pointer', height: '50px'}} onClick={(e) => {this.selectNodeTemplate(e, {type: nodeTemplate.type, vendor: nodeTemplate.vendor, model: nodeTemplate.model, tags: nodeTemplate.tags, image: nodeTemplate.image})}}>
                     <img src={nodeTemplate.image}  style={{height: '40px', width: '40px', float: 'right'}} alt='' />
                     <b>{nodeTemplate.vendor} {nodeTemplate.type}</b>
                     <br />
-                    {nodeTemplate.name}
+                    {nodeTemplate.model}
                 </div>
             )
         })
@@ -102,7 +102,7 @@ class NodeModal extends React.Component{
             nodeSearch: '',
             type: nodeTemplate.type,
             vendor: nodeTemplate.vendor,
-            name: nodeTemplate.name,
+            model: nodeTemplate.model,
             tags: nodeTemplate.tags,
             image: nodeTemplate.image,
         })
@@ -119,9 +119,12 @@ class NodeModal extends React.Component{
             ip: e.target.ip.value,
             vendor: e.target.vendor.value,
             type: e.target.type.value,
+            model: e.target.model.value,
             name: e.target.name.value,
-            image: e.target.image.value
+            image: e.target.image.value,
+            tags: this.state.tags,
         }
+
         axios.post(SERVER_URL+'/api/networkgraph/savenode', newNode)
         .then((response) => {
             if(response.data.ok){
@@ -197,6 +200,13 @@ class NodeModal extends React.Component{
                             </div>
 
                             <div className='form-group row'>
+                                <label className='col-xs-3 col-form-label'>Model</label>
+                                <div className='col-xs-9'>
+                                    <input name='model' id='node-model' className=' form-control input-sm' type='text' value={this.state.model}  onChange={(e)=>{this.setState({model: e.target.value})}} placeholder="Use search template for a quick selection." required  />
+                                </div>
+                            </div>
+
+                            <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Name</label>
                                 <div className='col-xs-9'>
                                     <input name='name' id='node-name' className=' form-control input-sm' type='text' value={this.state.name}  onChange={(e)=>{this.setState({name: e.target.value})}} placeholder="Use search template for a quick selection." required  />
@@ -205,30 +215,32 @@ class NodeModal extends React.Component{
 
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Tags</label>
-                                <ReactTags
-                                    tags={this.state.tags}
-                                    suggestions={this.state.suggestions}
-                                    handleAddition={this.handleAddition.bind(this)}
-                                    handleDelete={this.handleDelete.bind(this)}
-                                    allowDeleteFromEmptyInput={false}
-                                    maxLength = "16"
-                                    classNames={{
-                                        tags: 'ReactTags__tags',
-                                        tagInput: 'ReactTags__tagInput',
-                                        tagInputField: 'form-control ReactTags__tagInputField',
-                                        selected: 'ReactTags__selected',
-                                        tag: 'ReactTags__selected ReactTags__tag',
-                                        remove: 'ReactTags__selected ReactTags__remove',
-                                        suggestions: 'ReactTags__suggestions',
-                                        activeSuggestion: 'ReactTags__activeSuggestion'
-                                    }}
-                                />
+                                <div className='col-xs-9'>
+                                    <ReactTags
+                                        tags={this.state.tags}
+                                        suggestions={this.state.suggestions}
+                                        handleAddition={this.handleAddition.bind(this)}
+                                        handleDelete={this.handleDelete.bind(this)}
+                                        allowDeleteFromEmptyInput={false}
+                                        maxLength = "16"
+                                        classNames={{
+                                            tags: 'ReactTags__tags',
+                                            tagInput: 'ReactTags__tagInput',
+                                            tagInputField: 'form-control ReactTags__tagInputField',
+                                            selected: 'ReactTags__selected',
+                                            tag: 'ReactTags__selected ReactTags__tag',
+                                            remove: 'ReactTags__selected ReactTags__remove',
+                                            suggestions: 'ReactTags__suggestions',
+                                            activeSuggestion: 'ReactTags__activeSuggestion'
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Image</label>
                                 <div className='col-xs-9'>
-                                    <input name='image' id='node-image' className=' form-control input-sm' type='text'  value={this.state.image} onChange={(e)=>this.setState({photo: e.target.value})} placeholder="Use search template for a quick selection." required  />
+                                    <input name='image' id='node-image' className=' form-control input-sm' type='text'  value={this.state.image} onChange={(e)=>this.setState({image: e.target.value, photo: e.target.value})} placeholder="Use search template for a quick selection." required  />
                                 </div>
                             </div>
 

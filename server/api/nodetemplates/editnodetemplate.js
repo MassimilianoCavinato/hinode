@@ -5,13 +5,9 @@ module.exports = function (req, res){
     let atlas = require('../../db/atlas').atlas
     let mongodb = require('../../db/atlas').mongodb
     let _id = new mongodb.ObjectId(req.body._id)
-    let fields = {
-        type: req.body.type,
-        vendor: req.body.vendor,
-        name: req.body.name,
-        image: req.body.image,
-        tags: req.body.tags
-    }
+    delete req.body._id
+    let fields = req.body
+
     let image_url = req.body.image
     let final_image_url
     let temp_image_name = 'node__'+uuidv1()+'.png'
@@ -53,34 +49,19 @@ module.exports = function (req, res){
                 })
             }
             else if(result === null){
-                console.log("Node template id "+req.body._id+" couldn't be updated.")
+                console.log("Node template id "+_id+" couldn't be updated.")
                 res.send({
                     ok: false,
-                    error: "Node template id "+req.body._id+" couldn't be updated."
+                    error: "Node template id "+_id+" couldn't be updated."
                 })
             }
             else{
-                console.log("Node template id "+req.body._id+" updated succesfully.")
+                console.log("Node template id "+_id+" updated succesfully.")
                 res.send({
                     ok: true,
-                    data: "Node template id "+req.body._id+" couldn't be updated succesfully."
+                    data: "Node template id "+_id+" couldn't be updated succesfully."
                 })
             }
         })
     })
 }
-
-// let request = require('request')
-// let fs = require('fs')
-// let url = "https://www.mozilla.org/media/img/logos/firefox/logo-quantum-high-res.cfd87a8f62ae.png"
-//
-// request({ url: url, encoding: null }, function(error, response, body) {
-//     console.log(body instanceof Buffer);
-//     fs.writeFile('img/firefox.png', body, {
-//         encoding : null
-//     }, function(err) {
-//         if (err)
-//             res.send(err);
-//         res.send('saved')
-//     });
-// });

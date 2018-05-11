@@ -1,6 +1,6 @@
 import React from 'react'
 
-class NodeTemplateRow extends React.Component{
+class DeviceTemplateRow extends React.Component{
 
     render(){
 
@@ -13,7 +13,7 @@ class NodeTemplateRow extends React.Component{
                     {this.props.template.vendor}
                 </td>
                 <td className='col-xs-4'>
-                    {this.props.template.name}
+                    {this.props.template.model}
                 </td>
                 <td className='col-xs-2'>
                     <img src={this.props.template.image} style={{height: '40px'}} alt={this.props.template.image}/>
@@ -28,4 +28,4 @@ class NodeTemplateRow extends React.Component{
         )
     }
 }
-export default NodeTemplateRow
+export default DeviceTemplateRow

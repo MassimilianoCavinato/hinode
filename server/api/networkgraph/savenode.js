@@ -2,7 +2,7 @@ module.exports = function (req, res){
 
     let atlas = require('../../db/atlas').atlas
     let node = req.body
-    node.label = node.vendor+' '+node.type+'\n'+node.name+'\n'+node.ip
+    node.label = node.vendor+' '+node.model+'\n'+node.name+'\n'+node.ip
     console.log('SAVING NODE', node.id)
     atlas.then(function(client){
 

@@ -3,14 +3,14 @@ import { SERVER_URL } from '../config/config'
 import axios from 'axios'
 import { WithContext as ReactTags } from 'react-tag-input'
 
-class NewNodeTemplateForm extends React.Component{
+class NewDeviceTemplateForm extends React.Component{
 
     constructor(props){
         super(props)
         this.state = {
             type: '',
             vendor: '',
-            name: '',
+            model: '',
             image: '',
             tags: [],
             suggestions: []
@@ -34,9 +34,10 @@ class NewNodeTemplateForm extends React.Component{
     createNodeTemplate(e){
         e.preventDefault()
         let template = {
+            group: 'Device',
             type:  this.state.type,
             vendor:  this.state.vendor,
-            name:  this.state.name,
+            model:  this.state.model,
             image:  this.state.image,
             tags:  this.state.tags
         }
@@ -84,10 +85,10 @@ class NewNodeTemplateForm extends React.Component{
                             <button onClick={() => this.props.switchToReadMode()}className='btn btn-warning' style={{marginTop: 24}}><span className='glyphicon glyphicon-backward' /> Back</button>
                         </div>
                         <div className="col-sm-8">
-                            <h1>New Node Template</h1>
+                            <h1>New Device Template</h1>
                         </div>
                     </div>
-                    <form>
+                    <form onSubmit={(e) => {this.createNodeTemplate(e)}}>
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Type</label>
                             <div className="col-sm-8">
@@ -102,9 +103,9 @@ class NewNodeTemplateForm extends React.Component{
                         </div>
 
                         <div className="form-group row">
-                            <label className="col-sm-4 col-form-label">Name</label>
+                            <label className="col-sm-4 col-form-label">Model</label>
                             <div className="col-sm-8">
-                                <input type="text"  value={this.state.name} className="form-control input-sm" placeholder='Device Model, Name ...'  onChange={(e)=>{this.setState({name: e.target.value})}}/>
+                                <input type="text"  value={this.state.model} className="form-control input-sm" placeholder='Device Model, Name ...'  onChange={(e)=>{this.setState({model: e.target.value})}}/>
                             </div>
                         </div>
 
@@ -141,7 +142,7 @@ class NewNodeTemplateForm extends React.Component{
 
                         <div className="form-group row">
                             <div className="col-sm-offset-4 col-sm-8">
-                                <button className='btn btn-success form-control' onClick={(e) => {this.createNodeTemplate(e)}}>Create</button>
+                                <button className='btn btn-success form-control'>Create</button>
                             </div>
                         </div>
 
@@ -155,4 +156,4 @@ class NewNodeTemplateForm extends React.Component{
     }
 }
 
-export default NewNodeTemplateForm
+export default NewDeviceTemplateForm

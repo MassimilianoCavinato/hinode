@@ -5,6 +5,9 @@ module.exports = function (req, res){
     let uuidv1 = require('uuid/v1')
     let atlas = require('../../db/atlas').atlas
     let template = req.body
+
+
+    console.log(template)
     let image_url = template.image
     let final_image_url
     let temp_image_name = 'node__'+uuidv1()+'.png'
@@ -41,11 +44,11 @@ module.exports = function (req, res){
                 console.log(error)
                 res.send({
                     ok: false,
-                    data: "The node template could't be created."
+                    data: "The node template couldn't be created."
                 })
             }
             else if(result === null){
-                console.log("The node template could't be created.")
+                console.log("The node template couldn't be created.")
                 res.send({
                     ok: false,
                     data: "The node template could't be created."
