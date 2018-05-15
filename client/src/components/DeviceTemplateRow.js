@@ -19,7 +19,7 @@ class DeviceTemplateRow extends React.Component{
                     <img src={this.props.template.image} style={{height: '40px'}} alt={this.props.template.image}/>
                 </td>
                 <td className='col-xs-1'>
-                    <button onClick={() => this.props.switchToEditMode(this.props.template)} className='btn btn-sm btn-default'><span className='glyphicon glyphicon-pencil'> Edit</span></button>
+                    <button onClick={() => this.props.switchToEditDeviceMode(this.props.template)} className='btn btn-sm btn-default'><span className='glyphicon glyphicon-pencil'> Edit</span></button>
                 </td>
                 <td className='col-xs-1'>
                     <button onClick={() => this.props.deleteTemplate(this.props.template._id)} className='btn btn-sm btn-danger' ><span className='glyphicon glyphicon-remove'> Delete</span></button>

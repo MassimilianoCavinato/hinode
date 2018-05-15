@@ -82,3 +82,8 @@
     top: 2px;
     height: 52px;
 }
+
+.pointer-link{
+    cursor: pointer;
+
+}

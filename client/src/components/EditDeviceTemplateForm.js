@@ -88,6 +88,7 @@ class EditDeviceTemplateForm extends React.Component{
         return(
             <div className='row'>
                 <div className='col-sm-6'>
+
                     <div className="form-group row">
                         <div className="col-sm-4 col-form-label">
                             <button onClick={() => this.props.switchToReadMode()}className='btn btn-warning' style={{marginTop: 24}}><span className='glyphicon glyphicon-backward' /> Back</button>
@@ -96,19 +97,23 @@ class EditDeviceTemplateForm extends React.Component{
                             <h1>Edit Device Template</h1>
                         </div>
                     </div>
+
                     <form>
+
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Template Id</label>
                             <div className="col-sm-8">
                                 <input type="text"  value={this.props.template._id} className="form-control input-sm" placeholder='Radio, Switch, Sector ...' readOnly/>
                             </div>
                         </div>
+
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Type</label>
                             <div className="col-sm-8">
                                 <input type="text"  value={this.state.type} className="form-control input-sm" placeholder='Radio, Switch, Sector ...' onChange={(e)=>{this.setState({type: e.target.value})}}/>
                             </div>
                         </div>
+
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Vendor</label>
                             <div className="col-sm-8">
@@ -159,8 +164,10 @@ class EditDeviceTemplateForm extends React.Component{
                                 <button className='btn btn-success form-control' onClick={(e) => {this.editNodeTemplate(e)}}>Edit</button>
                             </div>
                         </div>
+
                     </form>
                 </div>
+
                 <div className='col-sm-6' style={{textAlign: 'center'}}>
                     <img src={this.state.image} alt='' style={{height: '300px', width: '300px', objectFit: 'contain', border: '1px solid #ddd', borderRadius: '8px', marginTop: '80px'}}/>
                 </div>

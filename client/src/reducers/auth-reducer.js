@@ -18,8 +18,6 @@ export default function authReducer(state = null, { type, payload }){
             }
 
         case 'onSignup':
-            console.log('SIGNUP REDUCER', payload)
-
             if(payload.ok){
                 sessionStorage.setItem('auth', JSON.stringify(payload.response))
                 return Object.assign({}, state, payload.response, {signedin: true})

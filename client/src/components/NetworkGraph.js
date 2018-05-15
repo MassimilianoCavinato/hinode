@@ -2,6 +2,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import Graph from 'react-graph-vis'
 import NodeModal from './NodeModal'
+import CustomerNodeModal from './CustomerNodeModal'
 import EdgeModal from './EdgeModal'
 import axios from 'axios'
 import  uuidv1 from 'uuid/v1'
@@ -192,14 +193,15 @@ class NetworkGraph extends React.Component{
             },
             modal: type
         })
-
     }
 
     toggleNetworkModals(){
 
         switch(this.state.modal){
-            case 'node':
+            case 'node device':
                 return <NodeModal closeModal={this.closeModal.bind(this)} node={this.state.node} refreshNetwork={this.refreshNetwork.bind(this)} />
+            case 'node customer':
+                return <CustomerNodeModal closeModal={this.closeModal.bind(this)} node={this.state.node} refreshNetwork={this.refreshNetwork.bind(this)} />
             case 'edge':
                 return <EdgeModal  closeModal={this.closeModal.bind(this)} edge={this.state.edge} refreshNetwork={this.refreshNetwork.bind(this)} />
             default:
@@ -218,12 +220,12 @@ class NetworkGraph extends React.Component{
         this.network.addEdgeMode()
     }
 
-    enterAddNodeMode(){
+    enterAddNodeMode(nodeType){
 
         let randomId =  uuidv1()
 
         this.setState({
-            modal: 'node',
+            modal: nodeType,
             node: {
                 id: randomId,
                 x: this.state.e.pointer.canvas.x,
@@ -245,10 +247,11 @@ class NetworkGraph extends React.Component{
 
         axios.get(SERVER_URL+'/api/networkgraph/getnode', {params:{id:this.network.getSelectedNodes()[0]}})
         .then((response) => {
-            console.log(response)
             if(response.data.ok){
+                let category = response.data.node.category.toLowerCase()
+                console.log(response.data.node)
                 this.setState({
-                    modal: 'node',
+                    modal: 'node ' + category,
                     node: response.data.node,
                     actionHint: 'Modify and save this selected node',
                     networkButtons: {
@@ -398,7 +401,8 @@ class NetworkGraph extends React.Component{
 
                 <div className='NetworkButtonsContainer' style={{textAlign: 'right'}}>
                     {this.state.mode === 'edit' ? <button  className='networkGraphButton' onClick={()=>this.toggleMode()} style={{backgroundImage: 'url(https://cdn4.iconfinder.com/data/icons/vectory-multimedia-1/40/move_4-512.png)', backgroundColor: ' #ffffff'}} title='Enable move mode' /> : <button  className='networkGraphButton' onClick={()=>this.toggleMode()} style={{backgroundImage: 'url(https://d30y9cdsu7xlg0.cloudfront.net/png/1320-200.png)', backgroundColor: ' #ffffff'}} title='Enable edit mode' />}
-                    { this.state.networkButtons.addNode && this.state.mode === 'edit' ? <button id='add-node' className='networkGraphButton' onClick={() => this.enterAddNodeMode()} style={{backgroundImage: 'url(https://d30y9cdsu7xlg0.cloudfront.net/png/157524-200.png)', backgroundColor: '#d5f5e3'}} title='Add Node' />  : null }
+                    { this.state.networkButtons.addNode && this.state.mode === 'edit' ? <button id='add-node' className='networkGraphButton' onClick={() => this.enterAddNodeMode("node device")} style={{backgroundImage: 'url(https://d30y9cdsu7xlg0.cloudfront.net/png/157524-200.png)', backgroundColor: '#d5f5e3'}} title='Add Device Node' />  : null }
+                    { this.state.networkButtons.addNode && this.state.mode === 'edit' ? <button id='add-node' className='networkGraphButton' onClick={() => this.enterAddNodeMode("node customer")} style={{backgroundImage: 'url(https://www.freeiconspng.com/uploads/account-profile-user-icon--icon-search-engine-10.png)', backgroundColor: '#d5f5e3'}} title='Add Customer Node' />  : null }
                     { this.state.networkButtons.editNode && this.state.mode === 'edit' ? <button id='edit-node' className='networkGraphButton'  onClick={() => this.enterEditNodeMode()} style={{backgroundImage: 'url(https://png.icons8.com/metro/1600/edit.png)', backgroundColor: ' #fcf3cf'}} title='Edit Node' /> : null }
                     { this.state.networkButtons.addEdge && this.state.mode === 'edit' ? <button id='add-edge' className='networkGraphButton'  onClick={() => this.enterAddEdgeMode()} style={{backgroundImage: 'url(http://simpleicon.com/wp-content/uploads/vector-path-curve.png)', backgroundColor: '#d5f5e3'}} title='Add Edge' /> : null }
                     { this.state.networkButtons.deleteElements && this.state.mode === 'edit' ? <button id='delete-selected' className='networkGraphButton' onClick={() => this.enterDeleteSelectedMode()} style={{backgroundImage: 'url(https://cdn.iconscout.com/public/images/icon/premium/png-512/trash-bin-recycle-dustbin-environment-302f53bae36f44ba-512x512.png)', backgroundColor: '#ec7063'}} title='Delete Selected' /> : null }
