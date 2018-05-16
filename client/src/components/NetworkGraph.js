@@ -317,15 +317,16 @@ class NetworkGraph extends React.Component{
         if(search_text.length > 0){
             let max_size = 15
             search_results = this.state.nodes.filter(node => {
-                if(node.type !== undefined){
+                if(node.category === "Device"){
                     return node.type.toLowerCase().includes(search_text) ||
                         node.vendor.toLowerCase().includes(search_text) ||
                         node.model.toLowerCase().includes(search_text) ||
                         node.name.toLowerCase().includes(search_text) ||
                         node.ip.toLowerCase().includes(search_text)
                 }
-                else{
-                    return null
+                else if(node.category === "Customer"){
+                    return node.name.toLowerCase().includes(search_text) ||
+                        node.provider.toLowerCase().includes(search_text)
                 }
             })
             if(search_results.length > max_size ){
@@ -339,16 +340,28 @@ class NetworkGraph extends React.Component{
 
     showSearchResults(){
         return this.state.search_results.map((node) => {
-            return(
-                <div key={node.id} className="nodeSearchResult form-control" onClick={() => {this.focusSearch(node)}}>
-                    {node.vendor} {node.model}
-                    <br />
-                    {node.name}
-                    <br />
-                    {node.ip}
-                    <img src={node.image} alt=''/>
-                </div>
-            )
+            if(node.category === "Device"){
+                return(
+                    <div key={node.id} className="nodeSearchResult form-control" onClick={() => {this.focusSearch(node)}}>
+                        {node.vendor} {node.model}
+                        <br />
+                        {node.name}
+                        <br />
+                        {node.ip}
+                        <img src={node.image} alt=''/>
+                    </div>
+                )
+            }
+            else if(node.category === "Customer"){
+                return(
+                    <div key={node.id} className="nodeSearchResult form-control" onClick={() => {this.focusSearch(node)}}>
+                        {node.name}
+                        <br />
+                        {node.ips.map((ip) => {return <div>{ip.ip}</div>})}
+                        <img src={node.image} alt=''/>
+                    </div>
+                )
+            }
         })
     }
 

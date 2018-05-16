@@ -113,34 +113,33 @@ class CustomerNodeModal extends React.Component{
 
     saveNode(e){
         e.preventDefault()
-        console.log(this.state)
-        // this.setState({saving: true})
-        // let newNode = {
-        //     id: e.target.id.value,
-        //     x: e.target.x.value,
-        //     y: e.target.y.value,
-        //     ip: e.target.ip.value,
-        //     vendor: e.target.vendor.value,
-        //     type: e.target.type.value,
-        //     model: e.target.model.value,
-        //     name: e.target.name.value,
-        //     image: e.target.image.value,
-        //     tags: this.state.tags,
-        // }
-        //
-        // axios.post(SERVER_URL+'/api/networkgraph/savenode', newNode)
-        // .then((response) => {
-        //     if(response.data.ok){
-        //         this.props.closeModal()
-        //         this.props.refreshNetwork()
-        //     }else{
-        //         this.setState({saveError: true})
-        //     }
-        // })
-        // .catch((error) => {
-        //     console.log(error)
-        //     this.setState({saveError: true})
-        // })
+        this.setState({saving: true})
+        let newNode = {
+            id: e.target.id.value,
+            x: e.target.x.value,
+            y: e.target.y.value,
+            category: "Customer",
+            name: e.target.name.value,
+            ips: this.state.ips,
+            vlans: this.state.vlans,
+            provider: e.target.provider.value,
+            tags: this.state.tags,
+            image: e.target.image.value
+        }
+
+        axios.post(SERVER_URL+'/api/networkgraph/savenode', newNode)
+        .then((response) => {
+            if(response.data.ok){
+                this.props.closeModal()
+                this.props.refreshNetwork()
+            }else{
+                this.setState({saveError: true})
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+            this.setState({saveError: true})
+        })
     }
 
     handleDelete(i) {
@@ -167,27 +166,27 @@ class CustomerNodeModal extends React.Component{
 
         return(
             this.state.ips.map((ip) => {
-                return <IpField key={ip.id} ip={ip.ip}  isList={true} removeIpField={this.removeIpField.bind(this, ip.id)} updateIp={this.updateIp.bind(this, ip.id)} />
+                return <IpField key={ip.id} data={ip}  isList={true} removeIpField={this.removeIpField.bind(this)} updateIp={this.updateIp.bind(this)} />
             })
         )
     }
 
-    updateIp(id, ip) {
+    updateIp(id, ip_value) {
 
-        let ips = this.state.ips.map(ip => {
+        let ips = this.state.ips
+        ips.map((ip) => {
             if(ip.id === id){
-                ip.ip = ip
+                ip.ip = ip_value
             }
             return ip
         })
-
         this.setState({ips: ips})
     }
 
     addIpField(e) {
         e.preventDefault()
         let ips = this.state.ips
-        ips.push({id: uuidv1(), ip: undefined})
+        ips.push({id: uuidv1(), ip: ''})
         this.setState({ips: ips})
 
     }
@@ -205,15 +204,27 @@ class CustomerNodeModal extends React.Component{
     showVlanFields(e) {
         return(
             this.state.vlans.map((vlan) => {
-                return <VlanField key={vlan.id} vlan={vlan.vlan} isList={true} removeVlanField={this.removeVlanField.bind(this, vlan.id)}/>
+                return <VlanField key={vlan.id} data={vlan} isList={true} removeVlanField={this.removeVlanField.bind(this)} updateVlan={this.updateVlan.bind(this)}/>
             })
         )
+    }
+
+    updateVlan(id, vlan_value) {
+
+        let vlans = this.state.vlans
+        vlans.map((vlan) => {
+            if(vlan.id === id){
+                vlan.vlan = vlan_value
+            }
+            return vlan
+        })
+        this.setState({vlans: vlans})
     }
 
     addVlanField(e) {
         e.preventDefault()
         let vlans = this.state.vlans
-        vlans.push({id: uuidv1(), vlan: undefined})
+        vlans.push({id: uuidv1(), vlan: ''})
         this.setState({vlans: vlans})
     }
 
@@ -274,14 +285,14 @@ class CustomerNodeModal extends React.Component{
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Provider</label>
                                 <div className='col-xs-9'>
-                                    <input name='vendor' id='node-vendor' className=' form-control input-sm' type='text' value={this.state.provider} onChange={(e)=>{this.setState({provider: e.target.value})}} placeholder="Use search template for a quick selection." required  />
+                                    <input name='provider' id='node-vendor' className=' form-control input-sm' type='text' value={this.state.provider} onChange={(e)=>{this.setState({provider: e.target.value})}} placeholder="Use search template for a quick selection." required  />
                                 </div>
                             </div>
 
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Priority</label>
                                 <div className='col-xs-9'>
-                                    <input name='type' id='node-type' className=' form-control input-sm' type='text' value={this.state.priority}  onChange={(e)=>{this.setState({priority: e.target.value})}} placeholder="Use search template for a quick selection." required  />
+                                    <input name='priority' id='node-type' className=' form-control input-sm' type='text' value={this.state.priority}  onChange={(e)=>{this.setState({priority: e.target.value})}} placeholder="Use search template for a quick selection." required  />
                                 </div>
                             </div>
 
