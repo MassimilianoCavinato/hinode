@@ -1,8 +1,10 @@
 import React from 'react'
 import axios from 'axios'
 import IpField from './IpField'
+import VlanField from './VlanField'
 import { WithContext as ReactTags } from 'react-tag-input'
 import { SERVER_URL } from '../config/config'
+import uuidv1 from 'uuid/v1'
 import '../css/tags.css'
 
 class CustomerNodeModal extends React.Component{
@@ -16,7 +18,8 @@ class CustomerNodeModal extends React.Component{
            saveError: false,
            saving: false,
            name: this.props.node.name || '',
-           network: this.props.node.network || {ip:['185.122.134.6/31', '144.2.241.138/29'], vlan: []},
+           ips: this.props.ips || [],
+           vlans: this.props.vlans || [],
            provider: this.props.node.provider || '',
            priority: this.props.node.priority || 2,
            tags: this.props.node.tags || '',
@@ -29,11 +32,6 @@ class CustomerNodeModal extends React.Component{
         this.getNodeTemplates()
         this.getTags()
     }
-
-    componentDidMount(){
-        console.log(this.state)
-    }
-
 
     getTags(){
         axios.get(SERVER_URL+'/api/tags/gettags')
@@ -59,7 +57,7 @@ class CustomerNodeModal extends React.Component{
             })
             this.setState({
                 nodeTemplates: nodeTemplates,
-            })
+            }, function(){console.log(this.state.nodeTemplates)})
         })
         .catch((error)=>{
             this.setState({nodeTemplates: []})
@@ -73,7 +71,9 @@ class CustomerNodeModal extends React.Component{
         let filteredNodeTemplates = []
         if(search_text.length > 0){
             filteredNodeTemplates = this.state.nodeTemplates.filter(nodeTemplate => {
-                return nodeTemplate.template_name.toLowerCase().includes(search_text)
+                if(nodeTemplate.template_name.toLowerCase().includes(search_text)){
+                    return nodeTemplate
+                }
             })
         }
 
@@ -88,7 +88,7 @@ class CustomerNodeModal extends React.Component{
 
         let nodeTemplateFilterResults = this.state.nodeTemplateFilterResults.map(nodeTemplate => {
             return(
-                <div key={nodeTemplate._id} style={{padding: "4px", border: '1px solid gray', borderRadius: '2px', marginBottom: '2px', backgroundColor: '#DDD', cursor: 'pointer', height: '50px'}} onClick={(e) => {this.selectNodeTemplate(e, {type: nodeTemplate.type, vendor: nodeTemplate.vendor, model: nodeTemplate.model, tags: nodeTemplate.tags, image: nodeTemplate.image})}}>
+                <div key={nodeTemplate._id} style={{padding: "4px", border: '1px solid gray', borderRadius: '2px', marginBottom: '2px', backgroundColor: '#DDD', cursor: 'pointer', height: '50px'}} onClick={(e) => {this.selectNodeTemplate(e, nodeTemplate)}} >
                     <img src={nodeTemplate.image}  style={{height: '40px', width: '40px', float: 'right'}} alt='' />
                     <b>{nodeTemplate.template_name}</b>
                 </div>
@@ -101,44 +101,46 @@ class CustomerNodeModal extends React.Component{
         this.setState({
             nodeTemplateFilterResults: [],
             nodeSearch: '',
-            type: nodeTemplate.type,
-            vendor: nodeTemplate.vendor,
-            model: nodeTemplate.model,
+            provider: nodeTemplate.provider,
+            priority: nodeTemplate.priority,
             tags: nodeTemplate.tags,
             image: nodeTemplate.image,
         })
+
+        console.log(nodeTemplate)
 
     }
 
     saveNode(e){
         e.preventDefault()
-        this.setState({saving: true})
-        let newNode = {
-            id: e.target.id.value,
-            x: e.target.x.value,
-            y: e.target.y.value,
-            ip: e.target.ip.value,
-            vendor: e.target.vendor.value,
-            type: e.target.type.value,
-            model: e.target.model.value,
-            name: e.target.name.value,
-            image: e.target.image.value,
-            tags: this.state.tags,
-        }
-
-        axios.post(SERVER_URL+'/api/networkgraph/savenode', newNode)
-        .then((response) => {
-            if(response.data.ok){
-                this.props.closeModal()
-                this.props.refreshNetwork()
-            }else{
-                this.setState({saveError: true})
-            }
-        })
-        .catch((error) => {
-            console.log(error)
-            this.setState({saveError: true})
-        })
+        console.log(this.state)
+        // this.setState({saving: true})
+        // let newNode = {
+        //     id: e.target.id.value,
+        //     x: e.target.x.value,
+        //     y: e.target.y.value,
+        //     ip: e.target.ip.value,
+        //     vendor: e.target.vendor.value,
+        //     type: e.target.type.value,
+        //     model: e.target.model.value,
+        //     name: e.target.name.value,
+        //     image: e.target.image.value,
+        //     tags: this.state.tags,
+        // }
+        //
+        // axios.post(SERVER_URL+'/api/networkgraph/savenode', newNode)
+        // .then((response) => {
+        //     if(response.data.ok){
+        //         this.props.closeModal()
+        //         this.props.refreshNetwork()
+        //     }else{
+        //         this.setState({saveError: true})
+        //     }
+        // })
+        // .catch((error) => {
+        //     console.log(error)
+        //     this.setState({saveError: true})
+        // })
     }
 
     handleDelete(i) {
@@ -161,32 +163,67 @@ class CustomerNodeModal extends React.Component{
         }
     }
 
-    showIpConfig() {
+    showIpFields() {
+
         return(
-            this.state.network.ip.map((ip) => {
-                return <IpField key={ip} ip={ip} />
+            this.state.ips.map((ip) => {
+                return <IpField key={ip.id} ip={ip.ip}  isList={true} removeIpField={this.removeIpField.bind(this, ip.id)} updateIp={this.updateIp.bind(this, ip.id)} />
             })
         )
     }
 
-    showVlanConfig() {
+    updateIp(id, ip) {
 
+        let ips = this.state.ips.map(ip => {
+            if(ip.id === id){
+                ip.ip = ip
+            }
+            return ip
+        })
+
+        this.setState({ips: ips})
     }
 
     addIpField(e) {
         e.preventDefault()
+        let ips = this.state.ips
+        ips.push({id: uuidv1(), ip: undefined})
+        this.setState({ips: ips})
+
     }
 
-    removeIpField(e) {
-        e.preventDefault()
+    removeIpField(id) {
+
+        let ips = this.state.ips.filter((ip) => {
+            if(ip.id !== id){
+                return ip
+            }
+        })
+        this.setState({ips: ips})
+    }
+
+    showVlanFields(e) {
+        return(
+            this.state.vlans.map((vlan) => {
+                return <VlanField key={vlan.id} vlan={vlan.vlan} isList={true} removeVlanField={this.removeVlanField.bind(this, vlan.id)}/>
+            })
+        )
     }
 
     addVlanField(e) {
         e.preventDefault()
+        let vlans = this.state.vlans
+        vlans.push({id: uuidv1(), vlan: undefined})
+        this.setState({vlans: vlans})
     }
 
-    removeVlanField(e) {
-        e.preventDefault()
+    removeVlanField(id) {
+        let vlans = this.state.vlans.filter((vlan) => {
+            if(vlan.id !== id){
+                return vlan
+            }
+        })
+        this.setState({vlans: vlans})
     }
 
     render(){
@@ -210,7 +247,7 @@ class CustomerNodeModal extends React.Component{
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Name</label>
                                 <div className='col-xs-9'>
-                                    <input name='name' id='node-name' className=' form-control input-sm' type='text' value={this.state.name}  onChange={(e)=>{this.setState({name: e.target.value})}} placeholder="Company name..." required  />
+                                    <input name='name' id='node-name' className=' form-control input-sm' type='text' value={this.state.name}  onChange={(e)=>{this.setState({name: e.target.value})}} placeholder="Customer, Company ..." required  />
                                 </div>
                             </div>
 
@@ -218,22 +255,22 @@ class CustomerNodeModal extends React.Component{
                                 <label className='col-xs-3 col-form-label'>Network</label>
                                 <div className='col-xs-9'>
                                     <div className='row'>
-                                        <div className='col-sm-7'>
-                                            <b>IP</b> <a className='pull-right pointer-link'>add</a>
+                                        <div className='col-sm-8'>
+                                            <b>IP</b> <a className='pull-right pointer-link' onClick={(e)=>{this.addIpField(e)}}>add</a>
                                             <div>
-                                                {this.showIpConfig()}
+                                                {this.showIpFields()}
                                             </div>
                                         </div>
-                                        <div className='col-sm-5'>
-                                            <b>VLAN</b> <a className='pull-right pointer-link'>add</a>
+                                        <div className='col-sm-4'>
+                                            <b>VLAN</b> <a className='pull-right pointer-link' onClick={(e)=>{this.addVlanField(e)}}>add</a>
                                             <div>
-                                                {this.showVlanConfig()}
+                                                {this.showVlanFields()}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr />
+
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Provider</label>
                                 <div className='col-xs-9'>
