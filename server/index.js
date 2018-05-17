@@ -10,6 +10,7 @@ server.use(cors())
 server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({extended: true}))
 server.use('/img', express.static(__dirname+'/img/'))
+server.use('/icon', express.static(__dirname+'/icon/'))
 server.listen(3001, function(){
     console.log("Node server listening", )
 })

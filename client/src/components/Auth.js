@@ -1,7 +1,10 @@
 import React from 'react'
 import Signin from './Signin'
 import Signup from './Signup'
+import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
+
+import '../css/auth.css'
 
 class Auth extends React.Component{
 
@@ -16,7 +19,11 @@ class Auth extends React.Component{
 
     render(){
         return(
-            <div style={{position: 'absolute', margin: 'auto', top: '0', bottom: '0', right: '0', left: '0', height: '400px', width: '100%'}}>
+            <div id='auth'>
+                <Helmet>
+                    <title>Network Graph</title>
+                    <style>{'body{background-image: url(https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/TtcstKI/videoblocks-abstract-motion-background-digital-plexus-data-networks-alpha-matte-loop_bbfr_r-rew_thumbnail-full01.png);}'}</style>
+                </Helmet>
                 {this.renderAuth()}
             </div>
         )

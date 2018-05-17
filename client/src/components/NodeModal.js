@@ -52,11 +52,7 @@ class NodeModal extends React.Component{
     getNodeTemplates(){
         axios.get(SERVER_URL+"/api/nodetemplates/getnodetemplates")
         .then((response) => {
-            let nodeTemplates = response.data.filter((template) =>{
-                if(template.group === "Device"){
-                    return template
-                }
-            })
+            let nodeTemplates = response.data.filter(template => template.group === "Device")
             this.setState({
                 nodeTemplates: nodeTemplates,
             })

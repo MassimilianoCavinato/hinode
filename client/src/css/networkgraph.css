@@ -13,36 +13,47 @@
     text-align: center;
 }
 
+#find-networkgraph{
+    max-width: 250px;
+    display: inline-block;
+}
+
+#network-graph-header{
+    padding: 4px;
+    background-color: #2e86c1;
+    padding: 4px;
+    height: 45px;
+    width: 100%;
+    position: relative;
+}
+
 @keyframes shake{
 
     10%, 90% {
-        transform: translate3d(-1px, 0, 0);
+        transform: translate3d(-0.5px, 0, 0);
     }
 
     20%, 80% {
-        transform: translate3d(2px, 0, 0);
+        transform: translate3d(1px, 0, 0);
     }
 
     30%, 50%, 70% {
-        transform: translate3d(-4px, 0, 0);
+        transform: translate3d(-1.5px, 0, 0);
     }
 
     40%, 60% {
-        transform: translate3d(4px, 0, 0);
+        transform: translate3d(1.5px, 0, 0);
     }
 }
 
 .networkGraphButton {
-    border-radius: 25%;
-    margin-bottom: 30px;
+    border-radius: 8px;
     border: 3px solid  #154360;
-    color: white;
-    padding: 6px;
-    height: 38px;
-    width: 38px;
+    height: 36px;
+    width: 36px;
     background-repeat: no-repeat;
     background-size: contain;
-    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 .networkGraphButton:hover{
@@ -85,5 +96,74 @@
 
 .pointer-link{
     cursor: pointer;
+}
+
+#new-node-buttons{
+    width: 100px;
+    height: 100px;
+    border: 4px outset gray;
+    border-radius: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 99;
+    overflow: hidden;
+}
+
+.semi-circ{
+    width: 50%;
+    height: 100px;
+    display: inline;
+    background-color: rgba(0,200,100,.5);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 1px 20px;
+}
+
+.semi-circ:hover{
+    background-color: #d3f271;
+}
+
+#selected-node-buttons{
+    width: 280px;
+    height: 110px;
+    position: absolute;
+    left: 45.2%;
+    top: 34%;
+    z-index: 99;
+    overflow: hidden;
+}
+
+.selected-networkgraph-button{
+    height: 80px;
+    width: 80px;
+    border-radius: 100%;
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 3px outset grey;
+
+}
+
+#edit-node{
+    position: absolute;
+    left: 0px;
+    top: 30px;
+    background-color: #fcf3cf;
+}
+
+#add-edge{
+    position: absolute;
+    left: 36%;
+    right: 0px;
+    background-color: #71c0f2;
+
+}
+
+#delete-selected{
+    position: absolute;
+	right: 0px;
+    top: 30px;
+    background-color: #ec7063;
 
 }

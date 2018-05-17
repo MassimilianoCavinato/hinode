@@ -34,30 +34,30 @@ class Signin extends React.Component{
 
     render(){
         return(
-            <div style={{margin: '0 auto', width: '300px', position: 'relative'}}>
-                <div style={{backgroundColor: 'rgba(50, 50, 50, .5)', padding: '0px 8px', borderRadius: '4px 4px 0px 0px', textAlign: 'center', color: 'white', border: '2px outset #BBB'}}>
-                    <img src={logo} style={{width: '150px'}} alt=''/>
+            <div>
+                <div className='auth-header'>
+                    <img src={logo} alt=''/>
                 </div>
-                <div style={{backgroundColor: 'rgba(50, 50, 50, .5)', padding: '8px 24px', borderRadius: '0px 0px 4px 4px', textAlign: 'center',  border: '2px outset #BBB'}}>
-                    <form onSubmit={this.onSignin.bind(this)}>
+                <div className='auth-body'>
+                    <form className='auth-form' onSubmit={this.onSignin.bind(this)}>
                         <br />
                         <div style={{position: 'relative'}}>
-                            <i className="glyphicon glyphicon-envelope" style={{position: 'absolute', top: '8px', right: '8px', color: '#FFF'}}></i>
-                            <input ref='email' type="email" className='form-control input-sm' autoFocus required placeholder='Email' style={{backgroundColor: 'rgba(0,0,0,.85)', color: 'white'}}/>
+                            <i className="glyphicon glyphicon-envelope"></i>
+                            <input ref='email' type="email" className='form-control input-sm' autoFocus required placeholder='Email'/>
                         </div>
                         <br />
                         <div style={{position: 'relative'}}>
-                            <i className="glyphicon glyphicon-lock" style={{position: 'absolute', top: '8px', right: '8px', color: '#FFF'}}></i>
-                            <input ref='password' type="password" className='form-control input-sm ' required placeholder='Password' style={{backgroundColor: 'rgba(0,0,0,.85)', color: 'white'}}/>
-                            <div style={{textAlign: 'right', fontSize: '12px', color: 'white', marginTop: '4px'}}>
+                            <i className="glyphicon glyphicon-lock"></i>
+                            <input ref='password' type="password" className='form-control input-sm ' required placeholder='Password'/>
+                            <div id='signin-remember-me-container'>
                                 Remember me <input ref="remember" type="checkbox" />
                             </div>
                         </div>
                         <br />
-                        <button type='submit' style={{width: "100px", borderRadius: '2px', backgroundColor: 'rgba(50,50,050,.5)', color: 'white'}}>Sign In</button>
+                        <button type='submit'>Sign In</button>
                         <br />
                         <br />
-                        <a  style={{fontSize: '12px', cursor: 'pointer', color: 'white'}} onClick={() => this.showSignup()}>Not registered?</a>
+                        <a  style={{}} onClick={() => this.showSignup()}>Not registered?</a>
                     </form>
                 </div>
                 {this.showSigninErrors()}

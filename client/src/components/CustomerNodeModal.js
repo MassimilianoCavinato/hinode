@@ -50,14 +50,8 @@ class CustomerNodeModal extends React.Component{
     getNodeTemplates(){
         axios.get(SERVER_URL+"/api/nodetemplates/getnodetemplates")
         .then((response) => {
-            let nodeTemplates = response.data.filter((template) =>{
-                if(template.group === "Customer"){
-                    return template
-                }
-            })
-            this.setState({
-                nodeTemplates: nodeTemplates,
-            }, function(){console.log(this.state.nodeTemplates)})
+            let nodeTemplates = response.data.filter(template => template.group === "Customer")
+            this.setState({nodeTemplates: nodeTemplates})
         })
         .catch((error)=>{
             this.setState({nodeTemplates: []})
@@ -70,17 +64,11 @@ class CustomerNodeModal extends React.Component{
         let search_text = e.target.value.toLowerCase()
         let filteredNodeTemplates = []
         if(search_text.length > 0){
-            filteredNodeTemplates = this.state.nodeTemplates.filter(nodeTemplate => {
-                if(nodeTemplate.template_name.toLowerCase().includes(search_text)){
-                    return nodeTemplate
-                }
-            })
+            filteredNodeTemplates = this.state.nodeTemplates.filter(nodeTemplate => nodeTemplate.template_name.toLowerCase().includes(search_text))
         }
-
         this.setState({
             nodeTemplateFilterResults: filteredNodeTemplates,
             nodeSearch: search_text,
-
         })
     }
 
@@ -193,11 +181,7 @@ class CustomerNodeModal extends React.Component{
 
     removeIpField(id) {
 
-        let ips = this.state.ips.filter((ip) => {
-            if(ip.id !== id){
-                return ip
-            }
-        })
+        let ips = this.state.ips.filter(ip => ip.id !== id)
         this.setState({ips: ips})
     }
 
@@ -229,11 +213,7 @@ class CustomerNodeModal extends React.Component{
     }
 
     removeVlanField(id) {
-        let vlans = this.state.vlans.filter((vlan) => {
-            if(vlan.id !== id){
-                return vlan
-            }
-        })
+        let vlans = this.state.vlans.filter(vlan => vlan.id !== id)
         this.setState({vlans: vlans})
     }
 
