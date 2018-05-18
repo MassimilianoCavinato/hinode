@@ -27,7 +27,7 @@
     position: relative;
 }
 
-@keyframes shake{
+/* @keyframes shake{
 
     10%, 90% {
         transform: translate3d(-0.5px, 0, 0);
@@ -44,31 +44,17 @@
     40%, 60% {
         transform: translate3d(1.5px, 0, 0);
     }
-}
+} */
 
-.networkGraphButton {
-    border-radius: 8px;
-    border: 3px solid  #154360;
-    height: 36px;
-    width: 36px;
-    background-repeat: no-repeat;
-    background-size: contain;
-    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-}
 
-.networkGraphButton:hover{
-    filter: brightness(85%);
-}
 
-.networkGraphButton:active{
-    filter: brightness(60%);
-}
 #searchResultContainer{
     position: absolute;
     top: 40px;
-    right: 50px;
+    right: 4px;
     width: 250px
 }
+
 .nodeSearchResult{
     cursor: pointer;
     z-index: 999;
@@ -87,6 +73,11 @@
 .nodeSearchResult:hover{
     border: 4px solid lime;
 }
+
+.withCursor{
+    border: 4px solid lime;
+}
+
 .nodeSearchResult > img{
     position: absolute;
     right: 2px;
@@ -98,72 +89,82 @@
     cursor: pointer;
 }
 
-#new-node-buttons{
-    width: 100px;
-    height: 100px;
-    border: 4px outset gray;
-    border-radius: 100%;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 99;
-    overflow: hidden;
-}
 
-.semi-circ{
-    width: 50%;
-    height: 100px;
-    display: inline;
-    background-color: rgba(0,200,100,.5);
+.networkGraphButton {
+    border-radius: 8px;
+    border: 3px solid  #154360;
+    height: 36px;
+    width: 36px;
+    background-repeat: no-repeat;
     background-size: contain;
-    background-repeat: no-repeat;
-    background-position: 1px 20px;
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
 
-.semi-circ:hover{
-    background-color: #d3f271;
+.networkGraphButton:hover{
+    filter: brightness(85%);
 }
 
-#selected-node-buttons{
-    width: 280px;
-    height: 110px;
+.networkGraphButton:active{
+    filter: brightness(60%);
+}
+
+#network-controller-container{
     position: absolute;
-    left: 45.2%;
-    top: 34%;
-    z-index: 99;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9;
     overflow: hidden;
+    background-color: rgba(0,20,20,.4);
+    border-radius: 50px;
+    border: 2px outset rgba(255,255,255,.5);
 }
 
-.selected-networkgraph-button{
-    height: 80px;
-    width: 80px;
+.network-controller-button{
     border-radius: 100%;
-    background-size: 50px;
+    border-width: 6px;
+    border-style: outset;
+    margin: 8px;
+    height: 50px;
+    width: 50px;
     background-repeat: no-repeat;
+    background-size: 26px 26px;
     background-position: center;
-    border: 3px outset grey;
+}
 
+.network-controller-button:hover{
+    filter: brightness(85%);
+}
+
+.network-controller-button:active{
+    filter: brightness(60%);
 }
 
 #edit-node{
-    position: absolute;
-    left: 0px;
-    top: 30px;
     background-color: #fcf3cf;
+    border-color: #fcf3cf;
 }
 
 #add-edge{
-    position: absolute;
-    left: 36%;
-    right: 0px;
     background-color: #71c0f2;
+    border-color: #71c0f2;
+}
 
+#check-neighbours{
+    background-color: #a0f271;
+    border-color: #a0f271;
 }
 
 #delete-selected{
-    position: absolute;
-	right: 0px;
-    top: 30px;
     background-color: #ec7063;
+    border-color: #ec7063;
+}
 
+#add-device-node{
+    background-color: #a8ffd8;
+    border-color: #a8ffd8;
+}
+
+#add-customer-node{
+    background-color: #a8ebff;
+    border-color: #a8ebff;
 }

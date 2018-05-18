@@ -1,4 +1,5 @@
 import React from 'react'
+import { textifyPriority } from '../utils/utils.js'
 
 class CustomerTemplateRow extends React.Component{
 
@@ -12,7 +13,7 @@ class CustomerTemplateRow extends React.Component{
                     {this.props.template.provider}
                 </td>
                 <td className='col-xs-2'>
-                    {this.props.template.priority}
+                    {textifyPriority(this.props.template.priority)}
                 </td>
                 <td className='col-xs-2'>
                     <img src={this.props.template.image} style={{height: '35px'}} alt={this.props.template.image} />

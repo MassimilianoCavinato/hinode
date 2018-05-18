@@ -1,6 +1,7 @@
 import React from 'react'
 import { SERVER_URL } from '../config/config'
 import axios from 'axios'
+import { textifyPriority } from '../utils/utils.js'
 import { WithContext as ReactTags } from 'react-tag-input'
 
 class NewCustomerTemplateForm extends React.Component{
@@ -78,20 +79,7 @@ class NewCustomerTemplateForm extends React.Component{
             alert("Tag "+tag.text+" already exists")
         }
     }
-
-    showPriorityText(){
-        switch(this.state.priority){
-            case 1:
-                return "Low"
-            case 2:
-                return "Medium"
-            case 3:
-                return "High"
-            default:
-                return "Medium"
-        }
-    }
-
+    
     render(){
         return(
             <div className='row'>
@@ -123,7 +111,7 @@ class NewCustomerTemplateForm extends React.Component{
                                 <input required type="range"  value={this.state.priority} className="form-control input-sm" min='1' max='3' step='1' onChange={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}} onInput={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}}/>
                             </div>
                             <div className="col-sm-2" style={{textAlign: 'center'}}>
-                                <div className='badge badge-pill' style={{padding: '9px', width: '100%'}}>{this.showPriorityText()}</div>
+                                <div className='badge badge-pill' style={{padding: '9px', width: '100%'}}>{textifyPriority(this.state.priority)}</div>
                             </div>
                         </div>
 

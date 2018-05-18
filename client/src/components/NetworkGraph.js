@@ -16,10 +16,11 @@ class NetworkGraph extends React.Component{
         this.state = {
             nodes: [],
             edges: [],
-            mode: 'edit',
+            moveMode: false,
             networkButtons: {
                 addNode: false,
                 editNode: false,
+                checkNeighbours: false,
                 deleteElements: false,
                 addEdge: false
             },
@@ -38,7 +39,8 @@ class NetworkGraph extends React.Component{
             addingEdge: false,
             marker: null,
             search_text: '',
-            search_results: []
+            search_results: [],
+            search_cursor: 0
         }
 
         this.startPosition = { position: { x: 3139.0571737074524, y: 2191.9180225526757 }, scale: 0.025 }
@@ -47,7 +49,6 @@ class NetworkGraph extends React.Component{
             autoResize: true,
             height: '100%',
             width: '100%',
-            ////////////////
             edges:{
                 arrows: {
                     to: {
@@ -62,7 +63,6 @@ class NetworkGraph extends React.Component{
                 // },
                 width: 5
             },
-            ////////////////
             nodes: {
                 shape: 'circularImage',
                 shadow: {
@@ -91,7 +91,14 @@ class NetworkGraph extends React.Component{
             },
             physics: false,
             interaction:{
-                dragNodes: false
+                dragNodes: false,
+                keyboard:{
+                    enabled: true,
+                    speed:{
+                        x: 5,
+                        y: 5
+                    }
+                }
             }
         }
     }
@@ -103,10 +110,7 @@ class NetworkGraph extends React.Component{
     networkOnInit(network){
 
         this.network = network
-        this.network.fit({
-            nodes: this.state.nodes,
-            animation: false
-        })
+
         this.network.manipulation.options.addEdge =  this.addEdge.bind(this)
 
         this.network.on('click', (e) => {
@@ -130,7 +134,7 @@ class NetworkGraph extends React.Component{
         this.network.on('zoom', (e) => {
             this.resetNetworkButtons()
         })
-        
+
         window.addEventListener("resize", () => {
             this.network.redraw()
         })
@@ -138,6 +142,7 @@ class NetworkGraph extends React.Component{
     }
 
     resetNetworkButtons(){
+
         this.setState({
             networkButtons: {
                 addNode: false,
@@ -161,12 +166,15 @@ class NetworkGraph extends React.Component{
 
         if(selection.nodes.length === 0 && selection.edges.length === 0){
             this.network.moveTo({
-                position: { x: e.pointer.canvas.x, y: e.pointer.canvas.y},
+                position: {
+                    x: e.pointer.canvas.x,
+                    y: e.pointer.canvas.y
+                },
                 animation: {
                     duration: 500,
                     easingFunction: 'easeOutCubic'
                 }
-            }, )
+            })
 
             setTimeout(() => {
                 this.setState({
@@ -200,12 +208,27 @@ class NetworkGraph extends React.Component{
                 }
             })
         }
+        else if(selection.edges.length === 1){
+
+            this.network.moveTo({
+                position: {
+                    x: e.pointer.canvas.x,
+                    y: e.pointer.canvas.y
+                },
+                scale: 0.75,
+                animation: {
+                    duration: 500,
+                    easingFunction: 'easeOutCubic'
+                }
+            })
+        }
         setTimeout(() => {
             this.toggleNetworkButtons(e)
         }, 520)
     }
 
     controlDragEnd(e){
+
         if(this.state.mode === 'move' && e.nodes.length === 1){
             let node = {
                 id: e.nodes[0],
@@ -222,16 +245,45 @@ class NetworkGraph extends React.Component{
         }
     }
 
-    toggleMode(){
-        let options = this.options
-        if(this.state.mode === 'edit'){
-            this.setState({mode: 'move', actionHint: 'Feel free to move devices around!'})
-            options.interaction.dragNodes = true
+    lockUnlockController() {
+
+        //see toggleMoveMode()
+        if(this.state.moveMode) {
+            return(
+                <button
+                    onClick={()=>this.toggleMoveMode()}
+                    className='networkGraphButton lockUnlock'
+                    style={{backgroundImage: 'url('+SERVER_URL+'/icon/unlocked.png)', backgroundColor: ' #ffffff'}}
+                    title='Enable edit mode'
+                />
+            )
         }
         else{
-            this.setState({mode: 'edit', actionHint: false})
+            return (
+                <button
+                    onClick={()=>this.toggleMoveMode()}
+                    className='networkGraphButton lockUnlock'
+                    style={{backgroundImage: 'url('+SERVER_URL+'/icon/locked.png)', backgroundColor: ' #ffffff'}}
+                    title='Enable move mode'
+                />
+            )
+        }
+    }
+
+    toggleMoveMode(){
+
+        this.resetNetworkButtons()
+        let options = this.options
+
+        if(this.state.moveMode){
+            this.setState({moveMode: false, actionHint: false})
             options.interaction.dragNodes = false
         }
+        else{
+            this.setState({moveMode: true, actionHint: 'Feel free to move devices around!'})
+            options.interaction.dragNodes = true
+        }
+
         this.network.setOptions(options)
     }
 
@@ -279,15 +331,16 @@ class NetworkGraph extends React.Component{
     }
 
     toggleNetworkButtons(e){
-
         this.setState({
             networkButtons:{
                 addNode: e.nodes.length === 0 && e.edges.length === 0,
-                editNode: e.nodes.length > 0,
+                editNode: e.nodes.length === 1,
+                addEdge: e.nodes.length === 1,
+                checkNeighbours: e.nodes.length === 1,
                 deleteElements: e.nodes.length > 0 || e.edges.length > 0,
-                addEdge: e.edges.length === 0 || e.nodes.length > 0
+
             }
-        })
+        }, console.log(this.state.networkButtons))
     }
 
     setModal(type){
@@ -445,16 +498,21 @@ class NetworkGraph extends React.Component{
             }
         }
         this.setState({
-            search_results: search_results
+            search_results: search_results,
+            search_cursor: 0
         })
     }
 
     showSearchResults(){
 
-        return this.state.search_results.map((node) => {
+        return this.state.search_results.map((node, index) => {
             if(node.category === "Device"){
                 return(
-                    <div key={node.id} className="nodeSearchResult form-control" onClick={() => {this.focusSearch(node)}}>
+                    <div
+                        key={node.id}
+                        className={`nodeSearchResult form-control ${this.state.search_cursor === index ? 'withCursor' : null}`}
+                        onClick={() => {this.focusSearch(node)}}
+                    >
                         {node.vendor} {node.model}
                         <br />
                         {node.name}
@@ -466,7 +524,11 @@ class NetworkGraph extends React.Component{
             }
             else if(node.category === "Customer"){
                 return(
-                    <div key={node.id} className="nodeSearchResult form-control" onClick={() => {this.focusSearch(node)}}>
+                    <div
+                        key={node.id}
+                        className={"nodeSearchResult form-control "+this.state.search_cursor === index ? 'withCursor' : null}
+                        onClick={() => {this.focusSearch(node)}}
+                    >
                         {node.name}
                         <br />
                         {node.ips.map((ip) => {return <div>{ip.ip}</div>})}
@@ -475,6 +537,32 @@ class NetworkGraph extends React.Component{
                 )
             }
         })
+    }
+
+    moveCursorOnResults(e){
+
+        let { search_results, search_cursor } = this.state
+        let newCursorPosition
+        if(this.state.search_results.length > 0){
+            if(e.keyCode === 38 && search_cursor > 0){ //up
+                newCursorPosition = this.state.search_cursor - 1
+                this.setState( prevState => ({
+                    search_cursor: prevState.search_cursor - 1
+                }))
+                console.log(newCursorPosition)
+            }
+            else if(e.keyCode === 40 && search_cursor < search_results.length -1){ //down
+                newCursorPosition = this.state.search_cursor + 1
+                this.setState( prevState => ({
+                    search_cursor: prevState.search_cursor + 1
+                }))
+                console.log(newCursorPosition)
+            }
+            else if(e.keyCode === 13){ //down
+                this.focusSearch(this.state.search_results[this.state.search_cursor])
+            }
+
+        }
     }
 
     focusSearch(node){
@@ -487,54 +575,71 @@ class NetworkGraph extends React.Component{
                 easingFunction: 'easeInOutCubic'
             }
         })
-
         this.network.unselectAll()
         this.network.selectNodes([node.id])
         this.setState({
             search_text: '',
             search_results: [],
-            networkButtons: {
-                editNode: true,
-                addEdge: true,
-                deleteElements: true,
-            }
+            search_cursor: 0
         })
+
+        this.toggleNetworkButtons({nodes: [node.id]})
     }
 
-    lockUnlockController() {
-        if(this.state.mode === 'edit') {
-            return (
-                <button
-                    onClick={()=>this.toggleMode()}
-                    className='networkGraphButton lockUnlock'
-                    style={{backgroundImage: 'url('+SERVER_URL+'/icon/locked.png)', backgroundColor: ' #ffffff'}}
-                    title='Enable move mode'
+    showNetworkGraphHeader(){
+        return(
+            <div id='network-graph-header'>
+                {this.lockUnlockController()}
+                <input
+                    id='find-networkgraph'
+                    type="text"
+                    className="form-control pull-right"
+                    placeholder="Find..."
+                    value={this.state.search_text}
+                    onChange={(e)=>{this.filterResults(e)}}
+                    onKeyDown={(e)=>{this.moveCursorOnResults(e)}}
                 />
-            )
-        }
-        else{
-            return(
-                <button
-                    onClick={()=>this.toggleMode()}
-                    className='networkGraphButton lockUnlock'
-                    style={{backgroundImage: 'url('+SERVER_URL+'/icon/unlocked.png)', backgroundColor: ' #ffffff'}}
-                    title='Enable edit mode'
-                />
-            )
-        }
+            </div>
+        )
     }
 
+    showActionHint(){
+        return(
+            this.state.actionHint ? <div id='action-hint' className='alert-success'>{this.state.actionHint}</div> : null
+        )
+    }
 
-    showNewNodeController(){
-        if(this.state.networkButtons.addNode && this.state.mode === 'edit'){
-            return(
-                <div id='new-node-buttons'>
-                    <button id='add-node' className='semi-circ' onClick={() => this.enterAddNodeMode("node device")} style={{backgroundImage: 'url('+SERVER_URL+'/icon/new_node_icon.png)'}} title='Add Device Node' />
-                    <button id='add-customer' className='semi-circ' onClick={() => this.enterAddNodeMode("node customer")} style={{backgroundImage:'url('+SERVER_URL+'/icon/customer_premises.png)'}} title='Add Customer Node' />
-                </div>
-            )
-        }
-        return null
+    searchResults(){
+        return(
+            <div id="searchResultContainer">
+                { this.state.search_results.length > 0 ? this.showSearchResults() : null }
+            </div>
+        )
+    }
+
+    showNetworkController(){
+        return(
+            <div id='network-controller-container'>
+                    <div>
+                        { this.state.networkButtons.editNode && !this.state.moveMode ? <button id='edit-node' className='network-controller-button'  onClick={() => this.enterEditNodeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edit.png)'}} title='Edit Node' /> : null }
+                    </div>
+                    <div>
+                        { this.state.networkButtons.addEdge && !this.state.moveMode ? <button id='add-edge' className='network-controller-button'  onClick={() => this.enterAddEdgeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edge.png)'}} title='Add Edge' /> : null }
+                    </div>
+                    <div>
+                        { this.state.networkButtons.checkNeighbours && !this.state.moveMode ? <button id='check-neighbours' className='network-controller-button'  onClick={() => alert('checking neighbours')} style={{backgroundImage: 'url('+SERVER_URL+'/icon/network_neighbours_icon.png)'}} title='Check Neighbours' /> : null }
+                    </div>
+                    <div>
+                        { this.state.networkButtons.deleteElements && !this.state.moveMode ? <button id='delete-selected' className='network-controller-button' onClick={() => this.enterDeleteSelectedMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/trash_bin.png)'}} title='Delete Selected' /> : null }
+                    </div>
+                    <div>
+                        { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-device-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node device")} style={{backgroundImage: 'url('+SERVER_URL+'/icon/new_node_icon.png)'}} title='Add Device Node' /> : null }
+                    </div>
+                    <div>
+                        { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-customer-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node customer")} style={{backgroundImage:'url('+SERVER_URL+'/icon/customer_premises.png)'}} title='Add Customer Node' /> : null }
+                    </div>
+            </div>
+        )
     }
 
     render(){
@@ -545,31 +650,11 @@ class NetworkGraph extends React.Component{
                     <title>Network Graph</title>
                     <style>{'body{background-image: url('+SERVER_URL+'/icon/hex_grid.jpg);}'}</style>
                 </Helmet>
-
-                <div id='network-graph-header'>
-                    {this.lockUnlockController()}
-                    <input
-                        id='find-networkgraph'
-                        type="text"
-                        className="form-control pull-right"
-                        placeholder="Find..."
-                        value={this.state.search_text}
-                        onChange={(e)=>{this.filterResults(e)}}
-                    />
-                </div>
-                {this.showNewNodeController()}
+                {this.showNetworkGraphHeader()}
                 <Graph  options={this.options}  graph={{nodes: this.state.nodes, edges: this.state.edges}} getNetwork={this.networkOnInit.bind(this)} />
-                { this.state.actionHint ? <div id='action-hint' className='alert-success'>{this.state.actionHint}</div> : null }
-                <div id="searchResultContainer">
-                    { this.state.search_results.length > 0 ? this.showSearchResults() : null }
-                </div>
-                <div id='selected-node-buttons'>
-                    <div>
-                        { this.state.networkButtons.editNode && this.state.mode === 'edit' ? <button id='edit-node' className='selected-networkgraph-button'  onClick={() => this.enterEditNodeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edit.png)'}} title='Edit Node' /> : null }
-                        { this.state.networkButtons.addEdge && this.state.mode === 'edit' ? <button id='add-edge' className='selected-networkgraph-button'  onClick={() => this.enterAddEdgeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edge.png)'}} title='Add Edge' /> : null }
-                        { this.state.networkButtons.deleteElements && this.state.mode === 'edit' ? <button id='delete-selected' className='selected-networkgraph-button' onClick={() => this.enterDeleteSelectedMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/trash_bin.png)'}} title='Delete Selected' /> : null }
-                    </div>
-                </div>
+                {this.showActionHint()}
+                {this.searchResults()}
+                {this.showNetworkController()}
                 {this.toggleNetworkModals()}
             </div>
         )
