@@ -78,7 +78,7 @@
     border: 4px solid lime;
 }
 
-.nodeSearchResult > img{
+.nodeSearchResult>img{
     position: absolute;
     right: 2px;
     top: 2px;

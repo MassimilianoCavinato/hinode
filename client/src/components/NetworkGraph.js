@@ -410,6 +410,7 @@ class NetworkGraph extends React.Component{
         axios.get(SERVER_URL+'/api/networkgraph/getnode', {params:{id:this.network.getSelectedNodes()[0]}})
         .then((response) => {
             if(response.data.ok){
+                console.log(response.data.node)
                 let category = response.data.node.category.toLowerCase()
                 console.log(response.data.node)
                 this.setState({
@@ -526,12 +527,12 @@ class NetworkGraph extends React.Component{
                 return(
                     <div
                         key={node.id}
-                        className={"nodeSearchResult form-control "+this.state.search_cursor === index ? 'withCursor' : null}
+                        className={`nodeSearchResult form-control ${this.state.search_cursor === index ? 'withCursor' : null}`}
                         onClick={() => {this.focusSearch(node)}}
                     >
                         {node.name}
                         <br />
-                        {node.ips.map((ip) => {return <div>{ip.ip}</div>})}
+                        {node.ips.map(ip => <div>{ip.ip}</div>)}
                         <img src={node.image} alt=''/>
                     </div>
                 )
@@ -580,13 +581,15 @@ class NetworkGraph extends React.Component{
         this.setState({
             search_text: '',
             search_results: [],
-            search_cursor: 0
+            search_cursor: 0,
+            actionHint: ''
         })
 
         this.toggleNetworkButtons({nodes: [node.id]})
     }
 
     showNetworkGraphHeader(){
+
         return(
             <div id='network-graph-header'>
                 {this.lockUnlockController()}
@@ -618,28 +621,59 @@ class NetworkGraph extends React.Component{
     }
 
     showNetworkController(){
+
         return(
             <div id='network-controller-container'>
-                    <div>
-                        { this.state.networkButtons.editNode && !this.state.moveMode ? <button id='edit-node' className='network-controller-button'  onClick={() => this.enterEditNodeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edit.png)'}} title='Edit Node' /> : null }
-                    </div>
-                    <div>
-                        { this.state.networkButtons.addEdge && !this.state.moveMode ? <button id='add-edge' className='network-controller-button'  onClick={() => this.enterAddEdgeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edge.png)'}} title='Add Edge' /> : null }
-                    </div>
-                    <div>
-                        { this.state.networkButtons.checkNeighbours && !this.state.moveMode ? <button id='check-neighbours' className='network-controller-button'  onClick={() => alert('checking neighbours')} style={{backgroundImage: 'url('+SERVER_URL+'/icon/network_neighbours_icon.png)'}} title='Check Neighbours' /> : null }
-                    </div>
-                    <div>
-                        { this.state.networkButtons.deleteElements && !this.state.moveMode ? <button id='delete-selected' className='network-controller-button' onClick={() => this.enterDeleteSelectedMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/trash_bin.png)'}} title='Delete Selected' /> : null }
-                    </div>
-                    <div>
-                        { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-device-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node device")} style={{backgroundImage: 'url('+SERVER_URL+'/icon/new_node_icon.png)'}} title='Add Device Node' /> : null }
-                    </div>
-                    <div>
-                        { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-customer-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node customer")} style={{backgroundImage:'url('+SERVER_URL+'/icon/customer_premises.png)'}} title='Add Customer Node' /> : null }
-                    </div>
+                <div>
+                    { this.state.networkButtons.editNode && !this.state.moveMode ? <button id='edit-node' className='network-controller-button'  onClick={() => this.enterEditNodeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edit.png)'}} title='Edit Node' /> : null }
+                </div>
+                <div>
+                    { this.state.networkButtons.addEdge && !this.state.moveMode ? <button id='add-edge' className='network-controller-button'  onClick={() => this.enterAddEdgeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edge.png)'}} title='Add Edge' /> : null }
+                </div>
+                <div>
+                    { this.state.networkButtons.checkNeighbours && !this.state.moveMode ? <button id='check-neighbours' className='network-controller-button'  onClick={() => console.log(this.scanNeighbours(this.network.getSelectedNodes()[0], 3))} style={{backgroundImage: 'url('+SERVER_URL+'/icon/network_neighbours_icon.png)'}} title='Check Neighbours' /> : null }
+                </div>
+                <div>
+                    { this.state.networkButtons.deleteElements && !this.state.moveMode ? <button id='delete-selected' className='network-controller-button' onClick={() => this.enterDeleteSelectedMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/trash_bin.png)'}} title='Delete Selected' /> : null }
+                </div>
+                <div>
+                    { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-device-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node device")} style={{backgroundImage: 'url('+SERVER_URL+'/icon/new_node_icon.png)'}} title='Add Device Node' /> : null }
+                </div>
+                <div>
+                    { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-customer-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node customer")} style={{backgroundImage:'url('+SERVER_URL+'/icon/customer_premises.png)'}} title='Add Customer Node' /> : null }
+                </div>
             </div>
         )
+    }
+
+    scanNeighbours(nodeId, hops){
+
+        let nodes = this.scanNeighbourNodes(nodeId, hops)
+        console.log(nodes)
+        return {nodes: nodes}
+        // let edges = []
+        // // for(let i=0; i< nodes.length; i++){
+        // //     edges.push(...this.network.getConnectedEdges(nodes[i]))
+        // // }
+        // // edges = [...new Set(edges)]
+        //
+
+
+
+    }
+
+    scanNeighbourNodes(nodeId, hops){
+
+        let connected_nodes = this.network.getConnectedNodes(nodeId)
+        if(hops > 1){
+            let temp = []
+            for(let i=0; i<connected_nodes.length; i++){
+                temp.push(...this.scanNeighbours(connected_nodes[i], hops-1))
+            }
+            connected_nodes.push(...temp)
+        }
+        connected_nodes = [...new Set(connected_nodes)]
+        return connected_nodes
     }
 
     render(){

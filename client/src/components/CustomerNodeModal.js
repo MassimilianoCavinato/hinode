@@ -2,6 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import IpField from './IpField'
 import VlanField from './VlanField'
+import { textifyPriority } from '../utils/utils.js'
 import { WithContext as ReactTags } from 'react-tag-input'
 import { SERVER_URL } from '../config/config'
 import uuidv1 from 'uuid/v1'
@@ -18,8 +19,8 @@ class CustomerNodeModal extends React.Component{
            saveError: false,
            saving: false,
            name: this.props.node.name || '',
-           ips: this.props.ips || [],
-           vlans: this.props.vlans || [],
+           ips: this.props.node.ips || [],
+           vlans: this.props.node.vlans || [],
            provider: this.props.node.provider || '',
            priority: this.props.node.priority || 2,
            tags: this.props.node.tags || '',
@@ -31,6 +32,10 @@ class CustomerNodeModal extends React.Component{
     componentWillMount(){
         this.getNodeTemplates()
         this.getTags()
+    }
+
+    componentDidMount(){
+        console.log(this.state)
     }
 
     getTags(){
@@ -111,6 +116,7 @@ class CustomerNodeModal extends React.Component{
             ips: this.state.ips,
             vlans: this.state.vlans,
             provider: e.target.provider.value,
+            priority: e.target.priority.value,
             tags: this.state.tags,
             image: e.target.image.value
         }
@@ -272,7 +278,14 @@ class CustomerNodeModal extends React.Component{
                             <div className='form-group row'>
                                 <label className='col-xs-3 col-form-label'>Priority</label>
                                 <div className='col-xs-9'>
-                                    <input name='priority' id='node-type' className=' form-control input-sm' type='text' value={this.state.priority}  onChange={(e)=>{this.setState({priority: e.target.value})}} placeholder="Use search template for a quick selection." required  />
+                                    <div className='row'>
+                                        <div className='col-xs-8'>
+                                            <input name='priority' required type="range"  value={this.state.priority} className="form-control input-sm" min='1' max='3' step='1' onChange={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}} onInput={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}}/>
+                                        </div>
+                                        <div className='col-xs-4' style={{textAlign: 'center'}}>
+                                            <div className='badge badge-pill' style={{padding: '9px', width: '100%'}}>{textifyPriority(this.state.priority)}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
