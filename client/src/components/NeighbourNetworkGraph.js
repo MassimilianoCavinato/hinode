@@ -1,6 +1,7 @@
 import React from 'react'
 import Graph from 'react-graph-vis'
 import { SERVER_URL } from '../config/config'
+
 class NeighbourNetworkGraph extends React.Component{
 
     constructor(props){
@@ -65,7 +66,7 @@ class NeighbourNetworkGraph extends React.Component{
     render(){
 
         return(
-            <div style={{height: '400px', width: '70vw', border: '3px solid grey', backgroundColor: 'yellow', borderRadius: '4px', backgroundImage: 'url('+SERVER_URL+'/icon/hex_grid.jpg)'}}>
+            <div style={{height: '400px', width: '60vw', border: '2px outset #999', backgroundColor: '#FEFEFE', borderRadius: '4px'}}>
                 {this.showGraph()}
             </div>
         )

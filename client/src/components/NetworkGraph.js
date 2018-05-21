@@ -103,9 +103,18 @@ class NetworkGraph extends React.Component{
     networkOnInit(network){
 
         this.network = network
+        this.network.once('afterDrawing', () => {
+            setTimeout(() => {
+                let nodeIds = this.state.nodes.map(node => node.id)
+                this.network.fit({
+                    nodes: nodeIds,
+                    animation: true
+                })
+            }, 500)
+
+        })
 
         this.network.manipulation.options.addEdge =  this.addEdge.bind(this)
-
         this.network.on('click', (e) => {
             this.resetNetworkButtons()
             this.controlClick(e)
@@ -217,7 +226,7 @@ class NetworkGraph extends React.Component{
         }
         setTimeout(() => {
             this.toggleNetworkButtons(e)
-        }, 520)
+        }, 500)
     }
 
     controlDragEnd(e){
@@ -266,7 +275,7 @@ class NetworkGraph extends React.Component{
     toggleMoveMode(){
 
         this.resetNetworkButtons()
-        let options = this.options
+        let options = this.state.options
 
         if(this.state.moveMode){
             this.setState({moveMode: false, actionHint: false})
@@ -606,6 +615,7 @@ class NetworkGraph extends React.Component{
 
             let edges = this.state.edges.filter(edge => connected_edges.includes(edge.id))
 
+            this.resetNetworkButtons()
 
             this.setState({
                 neighbourNetworkGraph: {
@@ -634,6 +644,7 @@ class NetworkGraph extends React.Component{
     }
 
     showGraph(){
+
         return(
             <div id='graph-wrapper'>
                 <Graph
@@ -786,6 +797,5 @@ class NetworkGraph extends React.Component{
         )
     }
 }
-
 
 export default NetworkGraph
