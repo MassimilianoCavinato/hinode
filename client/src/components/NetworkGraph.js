@@ -1,9 +1,9 @@
 import React from 'react'
-import { Helmet } from 'react-helmet'
 import Graph from 'react-graph-vis'
 import NodeModal from './NodeModal'
 import CustomerNodeModal from './CustomerNodeModal'
 import EdgeModal from './EdgeModal'
+import NeighbourNetworkGraph from './NeighbourNetworkGraph'
 import axios from 'axios'
 import  uuidv1 from 'uuid/v1'
 import { SERVER_URL } from '../config/config'
@@ -12,7 +12,9 @@ import '../css/networkgraph.css'
 class NetworkGraph extends React.Component{
 
     constructor(props){
+
         super(props)
+
         this.state = {
             nodes: [],
             edges: [],
@@ -40,67 +42,58 @@ class NetworkGraph extends React.Component{
             marker: null,
             search_text: '',
             search_results: [],
-            search_cursor: 0
-        }
-
-        this.startPosition = { position: { x: 3139.0571737074524, y: 2191.9180225526757 }, scale: 0.025 }
-
-        this.options = {
-            autoResize: true,
-            height: '100%',
-            width: '100%',
-            edges:{
-                arrows: {
-                    to: {
-                        enabled: false
+            search_cursor: 0,
+            neighbourNetworkGraph: null,
+            options: {
+                autoResize: true,
+                height: '100%',
+                width: '100%',
+                edges:{
+                    arrows: {
+                        to: {
+                            enabled: false
+                        }
+                    },
+                    smooth: false,
+                    width: 5
+                },
+                nodes: {
+                    shape: 'circularImage',
+                    shadow: {
+                        enabled: true
+                    },
+                    scaling: {
+                        min: 10,
+                        max: 1000,
+                        label: {
+                            enabled: true,
+                            min: 30,
+                            max: 80,
+                            maxVisible: 100,
+                            drawThreshold: 1
+                        }
+                    },
+                    size: 100,
+                    font: {
+                        size: 30
+                    },
+                    color: {
+                        highlight: {
+                            border: 'lime'
+                        }
                     }
                 },
-                smooth: false,
-                // smooth: {
-                //     enabled: true,
-                //     type: 'cubicBezier',
-                //     roundness: 0.75
-                // },
-                width: 5
-            },
-            nodes: {
-                shape: 'circularImage',
-                shadow: {
-                    enabled: true
-                },
-                scaling: {
-                    min: 10,
-                    max: 1000,
-                    label: {
+                physics: false,
+                interaction:{
+                    dragNodes: false,
+                    keyboard:{
                         enabled: true,
-                        min: 30,
-                        max: 80,
-                        maxVisible: 100,
-                        drawThreshold: 1
-                    }
-                },
-                size: 100,
-                font: {
-                    size: 30
-                },
-                color: {
-                    highlight: {
-                        border: 'lime'
-                    }
-                }
-            },
-            physics: false,
-            interaction:{
-                dragNodes: false,
-                keyboard:{
-                    enabled: true,
-                    speed:{
-                        x: 5,
-                        y: 5
                     }
                 }
             }
         }
+
+        this.startPosition = { position: { x: 3139.0571737074524, y: 2191.9180225526757 }, scale: 0.025 }
     }
 
     componentWillMount(){
@@ -356,20 +349,7 @@ class NetworkGraph extends React.Component{
         })
     }
 
-    toggleNetworkModals(){
 
-        switch(this.state.modal){
-            case 'node device':
-                return <NodeModal closeModal={this.closeModal.bind(this)} node={this.state.node} refreshNetwork={this.refreshNetwork.bind(this)} />
-            case 'node customer':
-                return <CustomerNodeModal closeModal={this.closeModal.bind(this)} node={this.state.node} refreshNetwork={this.refreshNetwork.bind(this)} />
-            case 'edge':
-                return <EdgeModal  closeModal={this.closeModal.bind(this)} edge={this.state.edge} refreshNetwork={this.refreshNetwork.bind(this)} />
-            default:
-                return null
-        }
-
-    }
 
     enterAddEdgeMode(){
 
@@ -588,6 +568,53 @@ class NetworkGraph extends React.Component{
         this.toggleNetworkButtons({nodes: [node.id]})
     }
 
+    scanNeighbours(nodeId, current_hop, last_hop){
+
+            let connected_nodes = [nodeId]
+            let connected_edges = []
+
+            while(current_hop < last_hop){
+
+                console.log(current_hop, connected_nodes)
+
+                let next_nodes = []
+                let next_edges = []
+                for(let i=0; i< connected_nodes.length; i++){
+                    next_nodes.push(...this.network.getConnectedNodes(connected_nodes[i]))
+                    next_edges.push(...this.network.getConnectedEdges(connected_nodes[i]))
+                }
+
+                connected_nodes.push(...next_nodes)
+                connected_edges.push(...next_edges)
+
+                connected_nodes = [...new Set(connected_nodes)]
+                connected_edges = [...new Set(connected_edges)]
+
+                current_hop++
+            }
+
+            let nodes = this.state.nodes.filter(node => connected_nodes.includes(node.id)).map((node) => {
+
+                if(node.id === nodeId){
+                    node.borderWidth = 5
+                    node.color = {
+                        border: '#32CD32'
+                    }
+                }
+                return node
+            })
+
+            let edges = this.state.edges.filter(edge => connected_edges.includes(edge.id))
+
+
+            this.setState({
+                neighbourNetworkGraph: {
+                    nodes: nodes,
+                    edges: edges
+                }
+            })
+    }
+
     showNetworkGraphHeader(){
 
         return(
@@ -601,6 +628,18 @@ class NetworkGraph extends React.Component{
                     value={this.state.search_text}
                     onChange={(e)=>{this.filterResults(e)}}
                     onKeyDown={(e)=>{this.moveCursorOnResults(e)}}
+                />
+            </div>
+        )
+    }
+
+    showGraph(){
+        return(
+            <div id='graph-wrapper'>
+                <Graph
+                    options={this.state.options}
+                    graph={{nodes: this.state.nodes, edges: this.state.edges}}
+                    getNetwork={this.networkOnInit.bind(this)}
                 />
             </div>
         )
@@ -625,71 +664,124 @@ class NetworkGraph extends React.Component{
         return(
             <div id='network-controller-container'>
                 <div>
-                    { this.state.networkButtons.editNode && !this.state.moveMode ? <button id='edit-node' className='network-controller-button'  onClick={() => this.enterEditNodeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edit.png)'}} title='Edit Node' /> : null }
+                    { this.state.networkButtons.editNode && !this.state.moveMode ?
+                        <button
+                            id='edit-node'
+                            className='network-controller-button'
+                            onClick={() => this.enterEditNodeMode()}
+                            style={{backgroundImage: 'url('+SERVER_URL+'/icon/edit.png)'}}
+                            title='Edit Node'
+                        />
+                        : null
+                    }
                 </div>
                 <div>
-                    { this.state.networkButtons.addEdge && !this.state.moveMode ? <button id='add-edge' className='network-controller-button'  onClick={() => this.enterAddEdgeMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/edge.png)'}} title='Add Edge' /> : null }
+                    { this.state.networkButtons.addEdge && !this.state.moveMode ?
+                        <button
+                            id='add-edge'
+                            className='network-controller-button'
+                            onClick={() => this.enterAddEdgeMode()}
+                            style={{backgroundImage: 'url('+SERVER_URL+'/icon/edge.png)'}}
+                            title='Add Edge'
+                        />
+                        : null
+                    }
                 </div>
                 <div>
-                    { this.state.networkButtons.checkNeighbours && !this.state.moveMode ? <button id='check-neighbours' className='network-controller-button'  onClick={() => console.log(this.scanNeighbours(this.network.getSelectedNodes()[0], 3))} style={{backgroundImage: 'url('+SERVER_URL+'/icon/network_neighbours_icon.png)'}} title='Check Neighbours' /> : null }
+                    { this.state.networkButtons.checkNeighbours && !this.state.moveMode ?
+                        <button
+                            id='check-neighbours'
+                            className='network-controller-button'
+                            onClick={() => console.log(this.scanNeighbours(this.network.getSelectedNodes()[0], 0, 3))}
+                            style={{backgroundImage: 'url('+SERVER_URL+'/icon/network_neighbours_icon.png)'}}
+                            title='Check Neighbours'
+                        />
+                        : null
+                    }
                 </div>
                 <div>
-                    { this.state.networkButtons.deleteElements && !this.state.moveMode ? <button id='delete-selected' className='network-controller-button' onClick={() => this.enterDeleteSelectedMode()} style={{backgroundImage: 'url('+SERVER_URL+'/icon/trash_bin.png)'}} title='Delete Selected' /> : null }
+                    { this.state.networkButtons.deleteElements && !this.state.moveMode ?
+                        <button
+                            id='delete-selected'
+                            className='network-controller-button'
+                            onClick={() => this.enterDeleteSelectedMode()}
+                            style={{backgroundImage: 'url('+SERVER_URL+'/icon/trash_bin.png)'}}
+                            title='Delete Selected'
+                        />
+                        : null
+                    }
                 </div>
                 <div>
-                    { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-device-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node device")} style={{backgroundImage: 'url('+SERVER_URL+'/icon/new_node_icon.png)'}} title='Add Device Node' /> : null }
+                    { this.state.networkButtons.addNode && !this.state.moveMode ?
+                        <button
+                            id='add-device-node'
+                            className='network-controller-button'
+                            onClick={() => this.enterAddNodeMode("node device")}
+                            style={{backgroundImage: 'url('+SERVER_URL+'/icon/new_node_icon.png)'}}
+                            title='Add Device Node'
+                        />
+                        : null
+                    }
                 </div>
                 <div>
-                    { this.state.networkButtons.addNode && !this.state.moveMode ? <button id='add-customer-node' className='network-controller-button' onClick={() => this.enterAddNodeMode("node customer")} style={{backgroundImage:'url('+SERVER_URL+'/icon/customer_premises.png)'}} title='Add Customer Node' /> : null }
+                    { this.state.networkButtons.addNode && !this.state.moveMode ?
+                        <button
+                            id='add-customer-node'
+                            className='network-controller-button'
+                            onClick={() => this.enterAddNodeMode("node customer")}
+                            style={{backgroundImage:'url('+SERVER_URL+'/icon/customer_premises.png)'}}
+                            title='Add Customer Node'
+                        />
+                        : null
+                    }
                 </div>
             </div>
         )
     }
 
-    scanNeighbours(nodeId, hops){
+    toggleNetworkModals(){
 
-        let nodes = this.scanNeighbourNodes(nodeId, hops)
-        console.log(nodes)
-        return {nodes: nodes}
-        // let edges = []
-        // // for(let i=0; i< nodes.length; i++){
-        // //     edges.push(...this.network.getConnectedEdges(nodes[i]))
-        // // }
-        // // edges = [...new Set(edges)]
-        //
-
-
-
+        switch(this.state.modal){
+            case 'node device':
+                return <NodeModal closeModal={this.closeModal.bind(this)} node={this.state.node} refreshNetwork={this.refreshNetwork.bind(this)} />
+            case 'node customer':
+                return <CustomerNodeModal closeModal={this.closeModal.bind(this)} node={this.state.node} refreshNetwork={this.refreshNetwork.bind(this)} />
+            case 'edge':
+                return <EdgeModal  closeModal={this.closeModal.bind(this)} edge={this.state.edge} refreshNetwork={this.refreshNetwork.bind(this)} />
+            default:
+                return null
+        }
     }
 
-    scanNeighbourNodes(nodeId, hops){
+    showNeighbourNetworkGraph(){
+        return(
+            this.state.neighbourNetworkGraph !== null ?
+                <div style={{position: 'absolute', top: '15%', left: '25%', boxShadow: '5px 10px 18px #888888'}}>
+                    <NeighbourNetworkGraph
+                        nodes={this.state.neighbourNetworkGraph.nodes}
+                        edges={this.state.neighbourNetworkGraph.edges}
+                        closeNeighbourNetwork={this.closeNeighbourNetwork.bind(this)}
+                    />
+                </div>
+            : null
+        )
+    }
 
-        let connected_nodes = this.network.getConnectedNodes(nodeId)
-        if(hops > 1){
-            let temp = []
-            for(let i=0; i<connected_nodes.length; i++){
-                temp.push(...this.scanNeighbours(connected_nodes[i], hops-1))
-            }
-            connected_nodes.push(...temp)
-        }
-        connected_nodes = [...new Set(connected_nodes)]
-        return connected_nodes
+    closeNeighbourNetwork(){
+        this.setState({neighbourNetworkGraph: null})
     }
 
     render(){
 
         return(
-            <div style={{height: '95vh'}}>
-                <Helmet>
-                    <title>Network Graph</title>
-                    <style>{'body{background-image: url('+SERVER_URL+'/icon/hex_grid.jpg);}'}</style>
-                </Helmet>
+            <div style={{height: '100vh', backgroundImage: 'url('+SERVER_URL+'/icon/hex_grid.jpg)'}}>
                 {this.showNetworkGraphHeader()}
-                <Graph  options={this.options}  graph={{nodes: this.state.nodes, edges: this.state.edges}} getNetwork={this.networkOnInit.bind(this)} />
+                {this.showGraph()}
                 {this.showActionHint()}
                 {this.searchResults()}
                 {this.showNetworkController()}
                 {this.toggleNetworkModals()}
+                {this.showNeighbourNetworkGraph()}
             </div>
         )
     }

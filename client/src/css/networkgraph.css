@@ -1,3 +1,7 @@
+#graph-wrapper{
+    height: calc(100vh - 45px);
+}
+
 .NetworkButtonsContainer{
     position: absolute;
     right: 42px;
@@ -24,7 +28,6 @@
     padding: 4px;
     height: 45px;
     width: 100%;
-    position: relative;
 }
 
 /* @keyframes shake{
