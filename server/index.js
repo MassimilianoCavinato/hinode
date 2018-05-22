@@ -1,11 +1,12 @@
+const dotenv = require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const path = require('path')
 const util = require('util')
-const server = express()
 
 //SERVER
+const server = express()
 server.use(cors())
 server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({extended: true}))
@@ -43,14 +44,11 @@ server.post('/api/nodetemplates/createnodetemplate', function(req, res){ require
 server.put('/api/nodetemplates/editnodetemplate', function(req, res){ require('./api/nodetemplates/editnodetemplate')(req, res) })
 server.delete('/api/nodetemplates/deletenodetemplate', function(req, res){ require('./api/nodetemplates/deletenodetemplate')(req, res) })
 
-
-
 //TEST
 
 //download image test
 server.get('/api/test/downloadimg', function(req, res){ require('./api/test/downloadimg')(req, res) })
 server.get('/api/test/server', function(req, res){ require('./api/test/server')(req, res) })
-
 
 //TAGS
 server.get('/api/tags/gettags', function(req, res){ require('./api/tags/gettags')(req, res) })
