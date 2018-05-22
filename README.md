@@ -1,7 +1,7 @@
-#hinode
+# hinode
 Asset management, network monitoring system
 
-###Installation
+## Installation
 
 This project is using react, node and mongodb,  
 
@@ -12,18 +12,30 @@ MONGODB_CONN_STRING=mongodb://exmplesupersecretmongodbconnectionstringetceteraet
 
 I will include mongo db schemas soon.
 
-cd inside the client folder and run npm install
+```
+cd client
+npm install
 
-cd inside the server folder and run npm Installation
+cd server
+npm install
+```
 
-###Run client from project root directory
+### Run client from project root directory
+```
 cd client
 npm start
+```
 
-###Run server from porject root directory
+### Run server from porject root directory
+```
 cd server
 node index.js
+````
 
-I recommend to install supervisor globally with: npm install -g supervisor
-and run the node server with:
+#### I recommend to install supervisor globally with: 
+
+```
+npm install -g supervisor
+cd server
 supervisor index.js
+```
