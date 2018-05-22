@@ -43,21 +43,40 @@ class Signin extends React.Component{
                         <br />
                         <div style={{position: 'relative'}}>
                             <i className="glyphicon glyphicon-envelope"></i>
-                            <input ref='email' type="email" className='form-control input-sm' autoFocus required placeholder='Email'/>
+                            <input
+                                ref='email'
+                                type="email"
+                                className='form-control input-sm'
+                                autoFocus
+                                required
+                                placeholder='Email'
+                                autoComplete='new-email'
+                            />
                         </div>
                         <br />
                         <div style={{position: 'relative'}}>
                             <i className="glyphicon glyphicon-lock"></i>
-                            <input ref='password' type="password" className='form-control input-sm ' required placeholder='Password'/>
+                            <input
+                                ref='password'
+                                type="password"
+                                className='form-control input-sm '
+                                required placeholder='Password'
+                                autoComplete='new-password'
+                            />
                             <div id='signin-remember-me-container'>
-                                Remember me <input ref="remember" type="checkbox" />
+                                <span>Remember me</span>
+                                <input
+                                    ref="remember"
+                                    type="checkbox"
+                                    style={{marginLeft: '5px'}}
+                                />
                             </div>
                         </div>
                         <br />
                         <button type='submit'>Sign In</button>
                         <br />
                         <br />
-                        <a  style={{}} onClick={() => this.showSignup()}>Not registered?</a>
+                        <a  onClick={() => this.showSignup()}>Not registered?</a>
                     </form>
                 </div>
                 {this.showSigninErrors()}

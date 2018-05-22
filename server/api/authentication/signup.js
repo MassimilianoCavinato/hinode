@@ -9,7 +9,6 @@ module.exports =  function (req, res){
     let password_hash = bcrypt.hashSync(req.body.password, 3);
     let session_token = bcrypt.hashSync(req.body.email+req.body.password, 3)
 
-
     errors = []
 
     if(password !== password_confirm){ errors.push("The passwords don't match.")}

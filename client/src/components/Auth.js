@@ -4,8 +4,6 @@ import Signup from './Signup'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 
-import '../css/auth.scss'
-
 class Auth extends React.Component{
 
     renderAuth(){
