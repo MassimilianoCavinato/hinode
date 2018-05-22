@@ -12,9 +12,9 @@
 	width: 99%;
 }
 
- .header-fixed tr{
+.header-fixed tr{
  	width: 100%;
- }
+}
 
 .header-fixed thead, .header-fixed tbody, .header-fixed tr, .header-fixed td, .header-fixed th{
 	display: inline-block;

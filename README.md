@@ -27,7 +27,7 @@ cd client
 npm start
 ```
 
-### Run server from porject root directory
+### Run server from project root directory
 ```
 cd server
 node index.js

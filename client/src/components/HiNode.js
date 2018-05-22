@@ -17,7 +17,9 @@ class HiNode extends React.Component {
     componentWillMount(){
 
         let user = this.props.auth.user
+
         if(user !== null){
+
             axios.post(SERVER_URL+'/api/authentication/session_token', {_id: user._id, session_token: user.session_token})
             .then((response) => {
 

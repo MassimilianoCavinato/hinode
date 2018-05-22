@@ -2,9 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter, Route, Link} from 'react-router-dom'
 import Home from './Home'
+import UserProfile from './UserProfile'
 import NetworkGraph from './NetworkGraph'
 import NodeTemplate from './NodeTemplate'
-import '../css/home.css'
+import '../css/home.scss'
 
 class Menu extends React.Component{
 
@@ -19,9 +20,11 @@ class Menu extends React.Component{
                     <div id='menu-sidebar' style={{minHeight: '100vh'}}>
                         <ul style={{ listStyleType: "none", padding: 0 }}>
                             <li>
-                                <button className='menu-button'>
-                                    <span className='glyphicon glyphicon-user'> {this.props.auth.user.username}</span>
-                                </button>
+                                <Link to="/Profile">
+                                    <button className='menu-button'>
+                                        {this.props.auth.user.username}
+                                    </button>
+                                </Link>
                             </li>
                             <li>
                                 <Link to="/">
@@ -47,6 +50,7 @@ class Menu extends React.Component{
                         </ul>
                     </div>
                     <div style={{width: '100%'}}>
+                        <Route exact path='/Profile' component={UserProfile}/>
                         <Route exact path='/' component={Home}/>
                         <Route exact path='/NodeTemplate' component={NodeTemplate}/>
                         <Route exact path='/NetworkGraph' component={NetworkGraph}/>

@@ -21,6 +21,8 @@ server.listen(3001, function(){
 ///////////////////////////////////////////////////////////////////
 
 //AUTHENTICATION
+
+
 server.post('/api/authentication/signin', function(req, res){ let signin = require('./api/authentication/signin')(req, res) })
 server.post('/api/authentication/signup', function(req, res){ let signup = require('./api/authentication/signup')(req, res) })
 server.post('/api/authentication/session_token', function(req, res){ let session_token = require('./api/authentication/session_token')(req, res) })
