@@ -12,6 +12,7 @@ MONGODB_CONN_STRING=mongodb://exmplesupersecretmongodbconnectionstringetceteraet
 
 I will include mongo db schemas soon.
 
+### Installation
 ```
 cd client
 npm install
@@ -32,7 +33,7 @@ cd server
 node index.js
 ````
 
-#### I recommend to install supervisor globally with: 
+#### I recommend to install supervisor globally with:
 
 ```
 npm install -g supervisor
