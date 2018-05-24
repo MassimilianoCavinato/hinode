@@ -6,7 +6,6 @@ import { textifyPriority } from '../utils/utils.js'
 import { WithContext as ReactTags } from 'react-tag-input'
 import { SERVER_URL } from '../config/config'
 import uuidv1 from 'uuid/v1'
-import '../css/tags.css'
 
 class CustomerNodeModal extends React.Component{
 

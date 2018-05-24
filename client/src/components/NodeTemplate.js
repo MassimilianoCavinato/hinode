@@ -7,8 +7,6 @@ import NewDeviceTemplateForm from './NewDeviceTemplateForm'
 import EditDeviceTemplateForm from './EditDeviceTemplateForm'
 import NewCustomerTemplateForm from './NewCustomerTemplateForm'
 import EditCustomerTemplateForm from './EditCustomerTemplateForm'
-import '../css/nodetemplates.css'
-import '../css/tags.css'
 
 class NodeTemplate extends React.Component{
 
@@ -29,6 +27,10 @@ class NodeTemplate extends React.Component{
     getTemplates(){
         axios.get(SERVER_URL+'/api/nodetemplates/getnodetemplates')
         .then((response) => {
+            response.data.map((template) => {
+                template.image = SERVER_URL+'/img/'+template.image
+                return template
+            })
             this.setState({node_templates: response.data})
         })
         .catch((error) => {

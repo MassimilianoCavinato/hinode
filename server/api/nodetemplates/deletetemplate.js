@@ -1,6 +1,6 @@
 module.exports = function (req, res){
 
-    var atlas = require('../../db/atlas')
+    var atlas = require('../../db/atlas').atlas
 
     let _id = req.query._id
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import Graph from 'react-graph-vis'
-import { SERVER_URL } from '../config/config'
 
 class NeighbourNetworkGraph extends React.Component{
 

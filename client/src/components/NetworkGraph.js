@@ -7,7 +7,6 @@ import NeighbourNetworkGraph from './NeighbourNetworkGraph'
 import axios from 'axios'
 import  uuidv1 from 'uuid/v1'
 import { SERVER_URL } from '../config/config'
-import '../css/networkgraph.css'
 
 class NetworkGraph extends React.Component{
 
@@ -495,10 +494,13 @@ class NetworkGraph extends React.Component{
 
     showSearchResults(){
 
-        return this.state.search_results.map((node, index) => {
-            if(node.category === "Device"){
-                return(
-                    <div
+        return (
+            this.state.search_results.map((node, index) => {
+
+                let div
+                if(node.category === "Device"){
+
+                    div = <div
                         key={node.id}
                         className={`nodeSearchResult form-control ${this.state.search_cursor === index ? 'withCursor' : null}`}
                         onClick={() => {this.focusSearch(node)}}
@@ -510,11 +512,11 @@ class NetworkGraph extends React.Component{
                         {node.ip}
                         <img src={node.image} alt=''/>
                     </div>
-                )
-            }
-            else if(node.category === "Customer"){
-                return(
-                    <div
+
+                }
+                else if(node.category === "Customer"){
+
+                    div = <div
                         key={node.id}
                         className={`nodeSearchResult form-control ${this.state.search_cursor === index ? 'withCursor' : null}`}
                         onClick={() => {this.focusSearch(node)}}
@@ -524,9 +526,11 @@ class NetworkGraph extends React.Component{
                         {node.ips.map(ip => <div>{ip.ip}</div>)}
                         <img src={node.image} alt=''/>
                     </div>
-                )
-            }
-        })
+                }
+
+                return div
+            })
+        )
     }
 
     moveCursorOnResults(e){

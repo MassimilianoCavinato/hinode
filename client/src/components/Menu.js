@@ -5,7 +5,6 @@ import Home from './Home'
 import UserProfile from './UserProfile'
 import NetworkGraph from './NetworkGraph'
 import NodeTemplate from './NodeTemplate'
-import '../css/home.scss'
 
 class Menu extends React.Component{
 

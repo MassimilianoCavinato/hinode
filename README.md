@@ -40,3 +40,5 @@ npm install -g supervisor
 cd server
 supervisor index.js
 ```
+
+## This repo is under active development, it could be broken, clone it at your own risk :D

@@ -4,12 +4,13 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const path = require('path')
 const util = require('util')
+const multer = require('multer')()
 
 //SERVER
 const server = express()
 server.use(cors())
-server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({extended: true}))
+server.use(bodyParser.json())
 server.use('/img', express.static(__dirname+'/img/'))
 server.use('/icon', express.static(__dirname+'/icon/'))
 server.listen(3001, function(){
@@ -21,9 +22,7 @@ server.listen(3001, function(){
 ///////////////////////////////////////////////////////////////////
 
 //AUTHENTICATION
-
-
-server.post('/api/authentication/signin', function(req, res){ let signin = require('./api/authentication/signin')(req, res) })
+server.post('/api/authentication/signin', function(req, res){ require('./api/authentication/signin')(req, res) } )
 server.post('/api/authentication/signup', function(req, res){ let signup = require('./api/authentication/signup')(req, res) })
 server.post('/api/authentication/session_token', function(req, res){ let session_token = require('./api/authentication/session_token')(req, res) })
 
@@ -48,8 +47,8 @@ server.delete('/api/nodetemplates/deletenodetemplate', function(req, res){ requi
 
 //TEST
 
-//download image test
-server.get('/api/test/downloadimg', function(req, res){ require('./api/test/downloadimg')(req, res) })
+//upload img
+server.post('/api/upload/img', multer.single('file'), function(req, res){ require('./api/upload/img')(req, res) })
 server.get('/api/test/server', function(req, res){ require('./api/test/server')(req, res) })
 
 //TAGS

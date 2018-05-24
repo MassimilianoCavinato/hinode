@@ -2,7 +2,6 @@ import React from 'react'
 import axios from 'axios'
 import { WithContext as ReactTags } from 'react-tag-input'
 import { SERVER_URL } from '../config/config'
-import '../css/tags.css'
 
 class NodeModal extends React.Component{
 

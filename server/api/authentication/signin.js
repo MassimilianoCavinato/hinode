@@ -8,7 +8,7 @@ module.exports = function (req, res){
     atlas.then(function(client){
 
         client.db('test').collection('users').findOne({email: email}, function(error, result){
-    
+
             if(error){
                 res.send(error)
             }
@@ -58,5 +58,8 @@ module.exports = function (req, res){
                 })
             }
         })
+    })
+    .catch(function(error){
+        console.log(error)
     })
 }

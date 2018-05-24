@@ -14,11 +14,18 @@ class NewCustomerTemplateForm extends React.Component{
             priority: 2,
             image: '',
             tags: [],
-            suggestions: []
+            suggestions: [],
+            imagePreview: '',
+            resetImage: false,
         }
     }
 
     componentDidMount(){
+        this.getTags()
+    }
+
+    getTags(){
+
         axios.get(SERVER_URL+'/api/tags/gettags')
         .then((response) => {
             if(response.data.ok){
@@ -33,23 +40,40 @@ class NewCustomerTemplateForm extends React.Component{
     }
 
     createNodeTemplate(e){
+
         e.preventDefault()
 
+        let formData = new FormData();
+        formData.append('file', this.state.image)
 
-        let template = {
-            template_name: this.state.template_name,
-            group: 'Customer',
-            provider:  this.state.provider,
-            priority:  this.state.priority,
-            image:  this.state.image,
-            tags:  this.state.tags
-        }
-
-        axios.post(SERVER_URL+'/api/nodetemplates/createnodetemplate', template)
+        //attempt to upload the image first, retrieve ref link from server and then save node template
+        axios.post(SERVER_URL+'/api/upload/img', formData, {headers: {'Content-Type': 'multipart/form-data'}})
         .then((response) => {
             if(response.data.ok){
-                this.props.getTemplates()
-                this.props.switchToReadMode()
+
+                console.log('Image uploaded succesfully.')
+
+                let template = {
+                    template_name: this.state.template_name,
+                    group: 'Customer',
+                    provider: this.state.provider,
+                    priority: this.state.priority,
+                    tags: this.state.tags,
+                    image: response.data.data
+                }
+
+                axios.post(SERVER_URL+'/api/nodetemplates/createnodetemplate', template)
+                .then((response) => {
+                    if(response.data.ok){
+                        this.props.getTemplates()
+                        this.props.switchToReadMode()
+                    }else{
+                        console.log(response.data.error)
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
             }
             else{
                 console.log(response.data.error)
@@ -61,12 +85,14 @@ class NewCustomerTemplateForm extends React.Component{
     }
 
     handleDelete(i) {
+
         let template = this.state.template
         template.tags.splice(i, 1)
         this.setState({template: template})
     }
 
     handleAddition(tag) {
+
         tag.id = tag.id.toLowerCase().replace(/[^a-z0-9]/gi,'')
         tag.text = tag.text.toLowerCase().replace(/[^a-z0-9]/gi,'')
 
@@ -79,7 +105,61 @@ class NewCustomerTemplateForm extends React.Component{
             alert("Tag "+tag.text+" already exists")
         }
     }
-    
+
+    validateImageFile(e){
+
+        let allowedFileTypes = ['image/jpg', 'image/jpeg', 'image/png']
+        let maxFileSize = 5242880 //5Mb
+        let file = e.target.files[0]
+
+        if(allowedFileTypes.indexOf(file.type) > -1 && file.size <= maxFileSize){
+
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onloadend = () => {
+                this.setState({
+                    image: file,
+                    imagePreview: reader.result,
+                    resetImage: true
+                })
+            }
+        }
+        else{
+
+            this.setState({
+                image: '',
+                imagePreview: '',
+                resetImage: false
+            })
+
+            if(allowedFileTypes.indexOf(file.type) === -1){
+                console.log('Only .png, .jpg, .jpeg allowed')
+            }
+            if(file.size > maxFileSize){
+                console.log('This file is too large, max 5Mb allowed')
+            }
+        }
+    }
+
+    resetImageButton(){
+
+        return (
+            this.state.resetImage ?
+            <a onClick={()=>{this.resetImage()}}>Remove</a>
+            :
+            null
+        )
+    }
+
+    resetImage(){
+        this.refs.file.value = ''
+        this.setState({
+            imagePreview: '',
+            image: '',
+            resetImage: false
+        })
+    }
+
     render(){
         return(
             <div className='row'>
@@ -92,7 +172,7 @@ class NewCustomerTemplateForm extends React.Component{
                             <h1>New Customer Template</h1>
                         </div>
                     </div>
-                    <form onSubmit={(e) => {this.createNodeTemplate(e)}}>
+                    <form onSubmit={(e) => {this.createNodeTemplate(e)}} encType="multipart/form-data">
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Template Name</label>
                             <div className="col-sm-8">
@@ -107,10 +187,10 @@ class NewCustomerTemplateForm extends React.Component{
                         </div>
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Priority</label>
-                            <div className="col-sm-6">
-                                <input required type="range"  value={this.state.priority} className="form-control input-sm" min='1' max='3' step='1' onChange={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}} onInput={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}}/>
+                            <div className="col-sm-4">
+                                <input required type="range"  value={this.state.priority} className="form-control input-sm" min='1' max='3' step='1' onChange={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}} onInput={(e)=>{this.setState({priority: parseInt(e.target.value, 10)})}} style={{marginBottom: '4px'}}/>
                             </div>
-                            <div className="col-sm-2" style={{textAlign: 'center'}}>
+                            <div className="col-sm-4" style={{textAlign: 'center'}}>
                                 <div className='badge badge-pill' style={{padding: '9px', width: '100%'}}>{textifyPriority(this.state.priority)}</div>
                             </div>
                         </div>
@@ -142,7 +222,18 @@ class NewCustomerTemplateForm extends React.Component{
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Image</label>
                             <div className="col-sm-8">
-                                <input required type='text' value={this.state.image} className="form-control input-sm" placeholder='Image URL ...'  onChange={(e)=>{this.setState({image: e.target.value})}}/>
+                                <label className="custom-file">
+                                    <input
+                                        type='file'
+                                        ref='file'
+                                        onChange={(e) => {this.validateImageFile(e)}}
+                                        accept=".png, .jpg, .jpeg"
+                                        className='custom-file-input'
+                                        required
+                                    />
+                                    <span className="custom-file-control"></span>
+                                </label>
+                                {this.resetImageButton()}
                             </div>
                         </div>
 
@@ -155,7 +246,7 @@ class NewCustomerTemplateForm extends React.Component{
                     </form>
                 </div>
                 <div className='col-sm-6' style={{textAlign: 'center'}}>
-                    <img src={this.state.image} alt='' style={{width: '300px', height: '300px', objectFit: 'cover', marginTop: '100px', border: '1px solid #bbb'}}/>
+                    <img src={this.state.imagePreview} alt='' style={{width: '300px', height: '300px', objectFit: 'cover', marginTop: '100px', border: '1px solid #bbb'}}/>
                 </div>
             </div>
         )
