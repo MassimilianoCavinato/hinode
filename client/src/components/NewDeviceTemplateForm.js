@@ -13,11 +13,17 @@ class NewDeviceTemplateForm extends React.Component{
             model: '',
             image: '',
             tags: [],
-            suggestions: []
+            suggestions: [],
+            imagePreview: '',
+            resetImage: false
         }
     }
 
     componentDidMount(){
+        this.getTags()
+    }
+
+    getTags(){
         axios.get(SERVER_URL+'/api/tags/gettags')
         .then((response) => {
             if(response.data.ok){
@@ -32,20 +38,43 @@ class NewDeviceTemplateForm extends React.Component{
     }
 
     createNodeTemplate(e){
+
         e.preventDefault()
-        let template = {
-            group: 'Device',
-            type:  this.state.type,
-            vendor:  this.state.vendor,
-            model:  this.state.model,
-            image:  this.state.image,
-            tags:  this.state.tags
-        }
-        axios.post(SERVER_URL+'/api/nodetemplates/createnodetemplate', template)
+        let formData = new FormData();
+        formData.append('file', this.state.image)
+
+        //attempt to upload the image first, retrieve ref link from server and then save node template
+        axios.post(SERVER_URL+'/api/upload/img', formData, {headers: {'Content-Type': 'multipart/form-data'}})
         .then((response) => {
             if(response.data.ok){
-                this.props.getTemplates()
-                this.props.switchToReadMode()
+
+
+                // console.log()'requyire new device template';
+                // console.log('device template is returning a new object, each image is set');
+
+                console.log('Image uploaded succesfully.')
+
+                let template = {
+                    group: 'Device',
+                    type:  this.state.type,
+                    vendor:  this.state.vendor,
+                    model:  this.state.model,
+                    image:  response.data.data,
+                    tags:  this.state.tags
+                }
+
+                axios.post(SERVER_URL+'/api/nodetemplates/createnodetemplate', template)
+                .then((response) => {
+                    if(response.data.ok){
+                        this.props.getTemplates()
+                        this.props.switchToReadMode()
+                    }else{
+                        console.log(response.data.error)
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
             }
             else{
                 console.log(response.data.error)
@@ -63,6 +92,7 @@ class NewDeviceTemplateForm extends React.Component{
     }
 
     handleAddition(tag) {
+
         tag.id = tag.id.toLowerCase().replace(/[^a-z0-9]/gi,'')
         tag.text = tag.text.toLowerCase().replace(/[^a-z0-9]/gi,'')
 
@@ -76,7 +106,62 @@ class NewDeviceTemplateForm extends React.Component{
         }
     }
 
+    validateImageFile(e){
+
+        let allowedFileTypes = ['image/jpg', 'image/jpeg', 'image/png']
+        let maxFileSize = 5242880 //5Mb
+        let file = e.target.files[0]
+
+        if(allowedFileTypes.indexOf(file.type) > -1 && file.size <= maxFileSize){
+
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onloadend = () => {
+                this.setState({
+                    image: file,
+                    imagePreview: reader.result,
+                    resetImage: true
+                })
+            }
+        }
+        else{
+
+            this.setState({
+                image: '',
+                imagePreview: '',
+                resetImage: false
+            })
+
+            if(allowedFileTypes.indexOf(file.type) === -1){
+                console.log('Only .png, .jpg, .jpeg allowed')
+            }
+            if(file.size > maxFileSize){
+                console.log('This file is too large, max 5Mb allowed')
+            }
+        }
+    }
+
+    resetImageButton(){
+
+        return (
+            this.state.resetImage ?
+            <a onClick={()=>{this.resetImage()}}>Remove</a>
+            :
+            null
+        )
+    }
+
+    resetImage(){
+        this.refs.file.value = ''
+        this.setState({
+            imagePreview: '',
+            image: '',
+            resetImage: false
+        })
+    }
+
     render(){
+
         return(
             <div className='row'>
                 <div className='col-sm-6'>
@@ -136,7 +221,18 @@ class NewDeviceTemplateForm extends React.Component{
                         <div className="form-group row">
                             <label className="col-sm-4 col-form-label">Image</label>
                             <div className="col-sm-8">
-                                <input type='text' value={this.state.image} className="form-control input-sm" placeholder='Image URL ...'  onChange={(e)=>{this.setState({image: e.target.value})}}/>
+                                <label className="custom-file">
+                                    <input
+                                        type='file'
+                                        ref='file'
+                                        onChange={(e) => {this.validateImageFile(e)}}
+                                        accept=".png, .jpg, .jpeg"
+                                        className='custom-file-input'
+                                        required
+                                    />
+                                    <span className="custom-file-control"></span>
+                                </label>
+                                {this.resetImageButton()}
                             </div>
                         </div>
 
@@ -149,7 +245,7 @@ class NewDeviceTemplateForm extends React.Component{
                     </form>
                 </div>
                 <div className='col-sm-6' style={{textAlign: 'center'}}>
-                    <img src={this.state.image} alt='' style={{width: '300px', height: '300px', objectFit: 'cover', marginTop: '100px', border: '1px solid #bbb'}}/>
+                    <img src={this.state.imagePreview} alt='' style={{width: '300px', height: '300px', objectFit: 'cover', marginTop: '100px', border: '1px solid #bbb'}}/>
                 </div>
             </div>
         )

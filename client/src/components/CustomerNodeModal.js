@@ -81,7 +81,7 @@ class CustomerNodeModal extends React.Component{
         let nodeTemplateFilterResults = this.state.nodeTemplateFilterResults.map(nodeTemplate => {
             return(
                 <div key={nodeTemplate._id} style={{padding: "4px", border: '1px solid gray', borderRadius: '2px', marginBottom: '2px', backgroundColor: '#DDD', cursor: 'pointer', height: '50px'}} onClick={(e) => {this.selectNodeTemplate(e, nodeTemplate)}} >
-                    <img src={nodeTemplate.image}  style={{height: '40px', width: '40px', float: 'right'}} alt='' />
+                    <img src={SERVER_URL+'/img/'+nodeTemplate.image}  style={{height: '40px', width: '40px', float: 'right'}} alt='' />
                     <b>{nodeTemplate.template_name}</b>
                 </div>
             )
@@ -320,7 +320,7 @@ class CustomerNodeModal extends React.Component{
                             </div>
 
                             <div style={{textAlign: 'center'}}>
-                                <img id='node-photo' src={this.state.image} style={{height: '150px', margin: 'auto'}} alt=''/>
+                                <img id='node-photo' src={SERVER_URL+'/img/'+this.state.image} style={{height: '150px', margin: 'auto'}} alt=''/>
                             </div>
                             {this.state.error ? <div className="alert alert-danger" style={{textAlign: 'center'}}>Oops, something wrong just happened.</div> : null}
                             <br />

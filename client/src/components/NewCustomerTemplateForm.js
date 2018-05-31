@@ -54,14 +54,13 @@ class NewCustomerTemplateForm extends React.Component{
                 console.log('Image uploaded succesfully.')
 
                 let template = {
-                    template_name: this.state.template_name,
                     group: 'Customer',
+                    template_name: this.state.template_name,
                     provider: this.state.provider,
                     priority: this.state.priority,
                     tags: this.state.tags,
                     image: response.data.data
                 }
-
                 axios.post(SERVER_URL+'/api/nodetemplates/createnodetemplate', template)
                 .then((response) => {
                     if(response.data.ok){
@@ -161,6 +160,7 @@ class NewCustomerTemplateForm extends React.Component{
     }
 
     render(){
+
         return(
             <div className='row'>
                 <div className='col-sm-6'>

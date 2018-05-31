@@ -86,6 +86,7 @@ class EditCustomerTemplateForm extends React.Component{
     }
 
     uploadImage(){
+
         let formData = new FormData();
         formData.append('file', this.state.image)
         //attempt to upload the image first, retrieve ref link from server and then save node template
@@ -288,6 +289,7 @@ class EditCustomerTemplateForm extends React.Component{
                         </div>
                     </form>
                 </div>
+                
                 <div className='col-sm-6' style={{textAlign: 'center'}}>
                     <img src={this.state.imagePreview} alt='' style={{height: '300px', width: '300px', objectFit: 'contain', border: '1px solid #ddd', borderRadius: '8px', marginTop: '80px'}}/>
                 </div>

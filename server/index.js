@@ -45,11 +45,12 @@ server.post('/api/nodetemplates/createnodetemplate', function(req, res){ require
 server.put('/api/nodetemplates/editnodetemplate', function(req, res){ require('./api/nodetemplates/editnodetemplate')(req, res) })
 server.delete('/api/nodetemplates/deletenodetemplate', function(req, res){ require('./api/nodetemplates/deletenodetemplate')(req, res) })
 
-//TEST
-
 //upload img
 server.post('/api/upload/img', multer.single('file'), function(req, res){ require('./api/upload/img')(req, res) })
-server.get('/api/test/server', function(req, res){ require('./api/test/server')(req, res) })
 
 //TAGS
 server.get('/api/tags/gettags', function(req, res){ require('./api/tags/gettags')(req, res) })
+
+
+//TEST
+server.get('/api/test/test1', function(req, res){ require('./api/test/test1')(req, res) })
